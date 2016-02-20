@@ -1,0 +1,8 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>images/RFMMainPageLogo.bmp</file>
+    <file>images/RFMSplashScreenLogo.bmp</file>
+    <file>images/RFMAppLogo.png</file>
+    <file>images/RFMAnimatedLogo.gif</file>
+</qresource>
+</RCC>
