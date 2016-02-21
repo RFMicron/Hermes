@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+NCDrill File Report For: Radon_Reader_1V3.PcbDoc   27.01.2014  08:26:06
+---------------------------------------------------------------------------
+
+Layer Pair : Top to Bottom
+ASCII RoundHoles File : Radon_Reader_1V3.TXT
+
+Tool         Hole Size           Hole Type     Hole Count Plated       Tool Travel
+---------------------------------------------------------------------------
+T1        6mil (0.1524mm)          Round          996              73.47 Inch (1866.17 mm)
+T2        7.87mil (0.1999mm)       Round          25               0.58 Inch (14.81 mm)
+T3        10mil (0.254mm)          Round          151              20.70 Inch (525.75 mm)
+T4        11.81mil (0.29997mm)     Round          2                0.09 Inch (2.21 mm)
+T5        12mil (0.3048mm)         Round          20               4.26 Inch (108.21 mm)
+T6        12.99mil (0.32995mm)     Round          16               0.80 Inch (20.40 mm)
+T7        13.78mil (0.35001mm)     Round          1                0.00 Inch (0.00 mm)
+T8        14mil (0.3556mm)         Round          7                4.93 Inch (125.19 mm)
+T9        19.68mil (0.49987mm)     Round          60               3.96 Inch (100.71 mm)
+T10       20mil (0.508mm)          Round          48               10.75 Inch (273.15 mm)
+T11       25.59mil (0.64999mm)     Round          35               9.34 Inch (237.18 mm)
+T12       39.37mil (1mm)           Round          11               2.72 Inch (69.11 mm)
+T13       82.68mil (2.10007mm)     Round          4                7.20 Inch (182.82 mm)
+---------------------------------------------------------------------------
+Totals                                            1376             138.81 Inch (3525.72 mm)
+
+Total Processing Time (hh:mm:ss) : 00:00:00

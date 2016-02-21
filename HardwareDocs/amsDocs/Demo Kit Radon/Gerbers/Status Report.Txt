@@ -1,0 +1,12 @@
+Output: NC Drill Files
+Type  : NC Drill
+From  : PCB Document [Radon_Reader_1V3.PcbDoc]
+   Generated File[Radon_Reader_1V3.TXT]
+   Generated File[Radon_Reader_1V3.LDP]
+   Generated File[Radon_Reader_1V3.DRR]
+
+
+Files Generated   : 3
+Documents Printed : 0
+
+Finished Output Generation At 08:26:06 On 27.01.2014
