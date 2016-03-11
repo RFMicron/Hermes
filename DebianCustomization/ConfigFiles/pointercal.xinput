@@ -1,0 +1,1 @@
+xinput set-int-prop "ft5x0x_ts" "Evdev Axis Calibration" 32 2 797 -6 467; xinput set-int-prop "ft5x0x_ts" "Evdev Axes Swap" 8 0;

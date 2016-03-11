@@ -1,0 +1,36 @@
+# Enable QWT
+qmake -set QMAKEFEATURES /usr/local/qwt-6.1.2/features/
+sudo ldconfig
+
+# Enable single click
+sudo chown debian:debian .config/libfm/libfm.conf
+chmod 644 .config/libfm/libfm.conf
+
+# Create Hermes App desktop soft link
+sudo chown -R debian:debian hermes
+mkdir Desktop
+cp /home/debian/hermes/hermes.desktop /home/debian/Desktop
+
+# Install Pakages
+sudo dpkg -i gstreamer/*.deb
+sudo dpkg -i florence/*.deb
+sudo dpkg -i jedit/*.deb
+sudo dpkg -i minicom/*.deb
+
+# Remove packages
+rm -r gstreamer/
+rm -r florence/
+rm -r jedit/
+rm -r minicom/
+
+# Change device tree sources owner
+sudo chown debian:debian hermesDeviceTrees/RFMICRON-HERMES-00A0.dts
+sudo chown debian:debian hermesDeviceTrees/HERMES-HW-00A0.dts
+sudo chown debian:debian hermesDeviceTrees/HERMES-HW-NOSPI-00A0.dts
+
+# Disable and remove hermesRunOnceScript
+sed '/hermesRunOnceScript/d' .xsessionrc >> tempPro
+rm .xsessionrc
+mv tempPro .xsessionrc
+chmod 644 .xsessionrc
+rm hermesRunOnceScript.rc

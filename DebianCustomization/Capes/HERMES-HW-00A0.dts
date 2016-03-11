@@ -1,0 +1,304 @@
+/*
+ * Copyright (C) 2016 RFMicron, Inc.
+ *
+ * Virtual cape for Hermes Hardware Resources
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "ti,beaglebone-black";
+
+	/* identification */
+	part-number = "HERMES-HW";
+	version = "00A0";
+
+	/* state the resources this cape uses */
+	exclusive-use =
+		/* the pin header uses */
+		"P9.21",	/* uart2_txd */
+		"P9.22",	/* uart2_rxd */
+		"P9.13",	/* uart4_txd */
+		"P9.11",	/* uart4_rxd */
+		"P9.24", 	/* dcan1_rx */
+		"P9.26", 	/* dcan1_tx */
+		"P9.18",	/* i2c1_sda */
+		"P9.17",	/* i2c1_scl */
+		"P8.13",	/* pwm: ehrpwm2B */
+		"P8.10",	/* capacitive touchscreen interrupt: gpio2_4 */
+
+		"P9.31",	/* spi1_sclk */
+		"P9.29",	/* spi1_d0 */
+		"P9.30",	/* spi1_d1 */
+		"P9.28",	/* spi1_cs0 */
+		"P9.39",	/* AIN0 */
+		"P9.40",	/* AIN1 */
+		"P9.37",	/* AIN2 */
+		"P9.38",	/* AIN3 */
+		"P9.33",	/* AIN4 */
+		"P9.36",	/* AIN5 */
+		"P9.35",	/* AIN6 */
+
+		/* the hardware ip uses */
+		"uart2",
+		"uart4",
+		"dcan1",
+		"i2c1",
+		"ehrpwm2B",
+		"spi1",
+		"gpio2_4",
+		"tscadc";
+
+	fragment@0 {
+		target = <&am33xx_pinmux>;
+		__overlay__ {
+			bb_uart2_pins: pinmux_bb_uart2_pins {
+				pinctrl-single,pins = <
+					0x150 0x21	/* spi0_sclk.uart2_rxd | MODE1 */
+					0x154 0x01	/* spi0_d0.uart2_txd | MODE1 */
+				>;
+			};
+
+			bb_uart4_pins: pinmux_bb_uart4_pins {
+				pinctrl-single,pins = <
+					0x070 0x26	/* gpmc_wait0.uart4_rxd | MODE6 */
+					0x074 0x06	/* gpmc_wpn.uart4_txd | MODE6 */
+				>;
+			};
+
+			dcan1_pins_s0: dcan1_pins_s0 {
+				pinctrl-single,pins = <
+				    0x180 0x12  /* d_can1_tx, SLEWCTRL_FAST | INPUT_PULLUP | MODE2 */
+				    0x184 0x32  /* d_can1_rx, SLEWCTRL_FAST | RECV_ENABLE | INPUT_PULLUP | MODE2 */
+				>;
+			};
+
+			bb_i2c1_pins: pinmux_bb_i2c1_pins {
+				pinctrl-single,pins = <
+					0x158 0x72	/* spi0_d1.i2c1_sda, SLEWCTRL_SLOW | INPUT_PULLUP | MODE2 */
+					0x15c 0x72	/* spi0_cs0.i2c1_scl, SLEWCTRL_SLOW | INPUT_PULLUP | MODE2 */
+				>;
+			};
+
+			pwm_P8_13: pinmux_pwm_P8_13_pins {
+				pinctrl-single,pins = <0x024  0x4>; /* P8_13 (ZCZ ball T10) | MODE 4 */
+			};
+
+			edt_ft5406_ts_pins: pinmux_edt_ft5406_ts_pins {
+				pinctrl-single,pins = <
+				0x098  0x37  /* gpmc_wen.gpio2_4  (PIN_INPUT_PULLUP | MUX_MODE7) */
+			    >;
+			};
+
+			bb_spi1_pins: pinmux_bb_spi1_pins {
+				pinctrl-single,pins = <
+					0x190 0x33	/* mcasp0_aclkx.spi1_sclk, INPUT_PULLUP | MODE3 */
+					0x194 0x33	/* mcasp0_fsx.spi1_d0, INPUT_PULLUP | MODE3 */
+					0x198 0x13	/* mcasp0_axr0.spi1_d1, OUTPUT_PULLUP | MODE3 */
+					0x19c 0x13	/* mcasp0_ahclkr.spi1_cs0, OUTPUT_PULLUP | MODE3 */
+				>;
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <&uart3>;	/* really uart2 */
+		__overlay__ {
+			status = "okay";
+			pinctrl-names = "default";
+			pinctrl-0 = <&bb_uart2_pins>;
+		};
+	};
+
+	fragment@2 {
+		target = <&uart5>;	/* really uart4 */
+		__overlay__ {
+			status = "okay";
+			pinctrl-names = "default";
+			pinctrl-0 = <&bb_uart4_pins>;
+		};
+	};
+
+	fragment@3 {
+		target = <&dcan1>;
+		__overlay__ {
+		     #address-cells = <1>;
+		     #size-cells = <0>;	 
+		     status = "okay";
+		     pinctrl-names = "default";
+		     pinctrl-0 = <&dcan1_pins_s0>;
+		};
+	};
+
+	fragment@4 {
+		target = <&i2c1>;	/* i2c1 is numbered correctly */
+		__overlay__ {
+			status = "okay";
+			pinctrl-names = "default";
+			pinctrl-0 = <&bb_i2c1_pins>;
+			/* this is the configuration part */
+			clock-frequency = <100000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+		};
+	};
+
+	fragment@5 {
+		target = <&epwmss0>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@6 {
+		target = <&ehrpwm0>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@7 {
+		target = <&ecap0>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@8 {
+		target = <&epwmss1>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@9 {
+		target = <&ehrpwm1>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@10 {
+		target = <&epwmss2>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@11 {
+		target = <&ehrpwm2>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@12 {
+		target = <&ecap2>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@13 {
+		target = <&ocp>;
+		__overlay__ {
+			pwm_test_P8_13 {
+				compatible	= "pwm_test";
+				pwms 		= <&ehrpwm2 1 530 1>;
+				pwm-names 	= "PWM_P8_13";
+
+				pinctrl-names	= "default";
+				pinctrl-0	= <&pwm_P8_13>;
+
+				enabled		= <1>;
+				duty		= <265>;
+				status 		= "okay";
+			};
+		};
+	};
+
+       fragment@14 {
+               target = <&i2c2>;
+
+               __overlay__ {
+
+		       /* needed to avoid gripping by DTC */
+		       #address-cells = <1>;
+		       #size-cells = <0>;
+			newhaven@38 {
+        			status = "okay";
+       	 			compatible = "edt,edt-ft5x06";
+        			pinctrl-names = "default";
+        			pinctrl-0 = <&edt_ft5406_ts_pins>;
+				reg = <0x38>;
+				interrupt-parent = <&gpio3>;
+				interrupts = <4>;
+        			touchscreen-size-x = <800>;
+        			touchscreen-size-y = <480>;
+			};
+
+               };
+       }; 
+
+	fragment@15 {
+		target = <&ocp>;
+		__overlay__ {
+			/* avoid stupid warning */
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			tscadc {
+				compatible = "ti,ti-tscadc";
+				reg = <0x44e0d000 0x1000>;
+
+				interrupt-parent = <&intc>;
+				interrupts = <16>;
+				ti,hwmods = "adc_tsc";
+				status = "okay";
+
+				adc {
+					ti,adc-channels = <0 1 2 3 4 5 6 7>;
+				};
+			};
+
+			test_helper: helper {
+				compatible = "bone-iio-helper";
+				vsense-name  = "AIN0", "AIN1", "AIN2", "AIN3", "AIN4", "AIN5", "AIN6", "AIN7";
+				vsense-scale = <100     100     100     100     100     100     100     100>;
+				status = "okay";
+			};
+		};
+	};
+
+	fragment@16 {
+		target = <&spi1>;	/* spi1 is numbered correctly */
+		__overlay__ {
+			status = "okay";
+			pinctrl-names = "default";
+			pinctrl-0 = <&bb_spi1_pins>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			channel@0 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				compatible = "spidev";
+				reg = <0>;
+				spi-max-frequency = <16000000>;
+				spi-cpha;
+			};
+
+			channel@1 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				compatible = "spidev";
+				reg = <1>;
+				spi-max-frequency = <16000000>;
+			};
+		};
+	};
+};

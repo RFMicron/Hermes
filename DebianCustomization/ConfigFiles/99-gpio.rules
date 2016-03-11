@@ -1,0 +1,2 @@
+KERNEL=="gpio*", SUBSYSTEM=="gpio", ACTION=="add", PROGRAM="/bin/sh -c 'chown -R debian:debian /sys/class/gpio'"
+KERNEL=="gpio*", SUBSYSTEM=="gpio", ACTION=="add", PROGRAM="/bin/sh -c 'chown -R debian:debian /sys/devices/virtual/gpio'"

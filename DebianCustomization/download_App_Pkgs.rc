@@ -1,0 +1,108 @@
+# These commands must be executed from a BeagleBone Black with Debian 7.9
+# Add the following source to /etc/apt/sources.list
+# deb http://http.debian.net/debian wheezy-backports main
+
+sudo apt-get update
+
+# Download gstreamer (Florence Dependence)
+mkdir gstreamer
+cd gstreamer
+apt-get download -t wheezy libgbm1 
+apt-get download -t wheezy-backports libavutil53
+apt-get download -t wheezy-backports libopus0
+apt-get download -t wheezy libwayland0
+apt-get download -t wheezy-backports libavcodec55
+apt-get download -t wheezy libegl1-mesa
+apt-get download -t wheezy libopenvg1-mesa
+apt-get download -t wheezy libegl1-mesa-drivers
+apt-get download -t wheezy libfluidsynth1
+apt-get download -t wheezy libgles2-mesa
+apt-get download -t wheezy libmpg123-0
+apt-get download -t wheezy libopencore-amrnb0
+apt-get download -t wheezy libopencore-amrwb0
+apt-get download -t wheezy libsrtp0
+apt-get download -t wheezy libglib2.0-doc
+apt-get download -t wheezy-backports libchromaprint0
+apt-get download -t wheezy-backports libxcb-dri2-0
+apt-get download -t wheezy-backports libxcb-xfixes0
+apt-get download -t wheezy-backports libgstreamer1.0-0
+apt-get download -t wheezy libmad0
+apt-get download -t wheezy-backports liborc-0.4-0
+apt-get download -t wheezy libmpeg2-4
+apt-get download -t wheezy-backports libgstreamer-plugins-base1.0-0
+apt-get download -t wheezy libsidplay1
+apt-get download -t wheezy libtwolame0
+apt-get download -t wheezy-backports libgstreamer-plugins-bad1.0-0
+apt-get download -t wheezy-backports gstreamer1.0-plugins-base
+apt-get download -t wheezy-backports gstreamer1.0-plugins-bad
+apt-get download -t wheezy-backports gir1.2-gstreamer-1.0
+apt-get download -t wheezy-backports gstreamer1.0-alsa
+apt-get download -t wheezy-backports gstreamer1.0-doc
+apt-get download -t wheezy-backports gstreamer1.0-libav
+apt-get download -t wheezy-backports gstreamer1.0-tools
+apt-get download -t wheezy-backports gstreamer1.0-plugins-base-apps
+apt-get download -t wheezy-backports gstreamer1.0-plugins-base-doc
+apt-get download -t wheezy-backports gstreamer1.0-plugins-good
+apt-get download -t wheezy-backports gstreamer1.0-plugins-good-doc
+apt-get download -t wheezy-backports liba52-0.7.4
+apt-get download -t wheezy-backports gstreamer1.0-plugins-ugly
+apt-get download -t wheezy-backports gstreamer1.0-plugins-ugly-doc
+apt-get download -t wheezy-backports gstreamer1.0-pulseaudio
+apt-get download -t wheezy-backports gstreamer1.0-x
+apt-get download -t wheezy-backports libgstreamer1.0-dev
+apt-get download -t wheezy-backports gstreamer1.0-libav-dbg
+apt-get download -t wheezy-backports gstreamer1.0-plugins-bad-dbg
+apt-get download -t wheezy-backports gstreamer1.0-plugins-bad-doc
+apt-get download -t wheezy-backports gstreamer1.0-plugins-base-dbg
+apt-get download -t wheezy-backports gstreamer1.0-plugins-good-dbg
+apt-get download -t wheezy-backports gstreamer1.0-plugins-ugly-dbg
+apt-get download -t wheezy-backports libgstreamer1.0-0-dbg
+cd ..
+tar -czvf gstreamer.tar.gz gstreamer
+rm -r gstreamer
+
+#download florence
+mkdir florence
+cd florence
+apt-get download -t wheezy libatspi2.0-0
+apt-get download -t wheezy at-spi2-core
+apt-get download -t wheezy-backports florence
+cd ..
+tar -czvf florence.tar.gz florence
+rm -r florence
+
+#download jedit
+mkdir jedit
+cd jedit
+apt-get download openjdk-6-jre-lib
+apt-get download ca-certificates-java
+apt-get download tzdata-java
+apt-get download java-common
+apt-get download libatk-wrapper-java
+apt-get download libatk-wrapper-java-jni
+apt-get download java-wrappers
+apt-get download jedit
+apt-get download ttf-dejavu-extra
+apt-get download openjdk-6-jre-headless
+apt-get download openjdk-6-jre
+apt-get download unzip 
+apt-get download icedtea-6-jre-cacao
+apt-get download icedtea-6-jre-jamvm
+apt-get download icedtea-netx-common
+apt-get download icedtea-netx
+cd ..
+tar -czvf jedit.tar.gz jedit
+rm -r jedit
+
+# download minicom
+mkdir minicom
+cd minicom
+apt-get download -t wheezy lrzsz
+apt-get download -t wheezy minicom
+cd ..
+tar -czvf minicom.tar.gz minicom
+rm -r minicom
+ 
+
+
+

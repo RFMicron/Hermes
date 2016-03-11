@@ -1,0 +1,69 @@
+ROOTFS=/media/rootfs
+DEBIAN=${ROOTFS}/home/debian
+
+# Replace Linux kernel and kernel modules
+cp Packages/3.8.13-bone79.zImage ${ROOTFS}/boot/vmlinuz-3.8.13-bone79
+tar xfv Packages/3.8.13-bone79-modules.tar.gz -C ${ROOTFS}
+
+# Add HERMES hardware resources tree files
+cp Capes/HERMES-HW-00A0.dtbo ${ROOTFS}/lib/firmware/
+cp Capes/HERMES-HW-NOSPI-00A0.dtbo ${ROOTFS}/lib/firmware/
+cp ConfigFiles/capemgr ${ROOTFS}/etc/default/
+mkdir ${DEBIAN}/hermesDeviceTrees
+cp Capes/HERMES-HW-00A0.dts ${DEBIAN}/hermesDeviceTrees
+cp Capes/HERMES-HW-NOSPI-00A0.dts ${DEBIAN}/hermesDeviceTrees
+cp Capes/RFMICRON-HERMES-00A0.dts ${DEBIAN}/hermesDeviceTrees
+
+# Allow debian user to use GPIO lines without using sudo
+cp ConfigFiles/99-gpio.rules ${ROOTFS}/etc/udev/rules.d/
+
+# Install Qt and QML
+tar xvf Packages/qt5.tar.gz -C ${ROOTFS}/usr/local
+tar xvf Packages/qwt-6.1.2.tar.gz -C ${ROOTFS}/usr/local
+echo 'export PATH=/usr/local/qt5/bin:$PATH' >> ${DEBIAN}/.profile
+echo '/usr/local/qwt-6.1.2/lib' >> ${ROOTFS}/etc/ld.so.conf
+
+# Add commands to initialize CAN 
+echo 'sudo ip link set can0 type can bitrate 100000 triple-sampling on' >> ${DEBIAN}/.xsessionrc
+echo 'sudo ip link set can0 up' >> ${DEBIAN}/.xsessionrc
+
+# Add Hermes source code and executables
+tar xvf Packages/hermes.tgz -C ${DEBIAN}
+
+# Copy file required to enable single click
+mkdir ${DEBIAN}/.config
+mkdir ${DEBIAN}/.config/libfm
+cp ConfigFiles/libfm.conf ${DEBIAN}/.config/libfm/
+
+# Copy Florence package and its dependencies
+tar xvf Packages/florence.tar.gz -C ${DEBIAN}
+tar xvf Packages/gstreamer.tar.gz -C ${DEBIAN}
+
+# Add JEdit packages
+tar xvf Packages/jedit.tar.gz -C ${DEBIAN}
+
+# Add CAN Utilities
+tar xvf Packages/can-utils.tar.gz -C ${DEBIAN}
+
+# Add Minicom
+tar xvf Packages/minicom.tar.gz -C ${DEBIAN}
+
+# Add Derek Molloy's book examples
+tar xvf Packages/exploringBB.tar.gz -C ${DEBIAN}
+
+# Disable screen calibration
+cp ConfigFiles/pointercal.xinput ${ROOTFS}/etc/
+
+# Add run once script
+echo 'sudo chown debian:debian hermesRunOnceScript.rc' >> ${DEBIAN}/.xsessionrc
+echo './hermesRunOnceScript.rc' >> ${DEBIAN}/.xsessionrc
+cp hermesRunOnceScript.rc ${DEBIAN}
+
+# Turn SD Card into a "Flasher Card"
+sed s/#cmdline=init/cmdline=init/ ${ROOTFS}/boot/uEnv.txt >> ${ROOTFS}/boot/tempFile
+rm ${ROOTFS}/boot/uEnv.txt
+mv ${ROOTFS}/boot/tempFile ${ROOTFS}/boot/uEnv.txt
+chmod 644 ${ROOTFS}/boot/uEnv.txt
+
+# Wait for all file operations to be completed
+sync

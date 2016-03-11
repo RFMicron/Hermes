@@ -1,0 +1,27 @@
+diff a/bb-kernel/KERNEL/drivers/input/touchscreen/edt-ft5x06.c b/bb-kernel/KERNEL/drivers/input/touchscreen/edt-ft5x06.c
+--- a/bb-kernel/KERNEL/drivers/input/touchscreen/edt-ft5x06.c	2016-03-04 16:48:39.613050999 -0600
++++ b/bb-kernel/KERNEL/drivers/input/touchscreen/edt-ft5x06.c	2016-03-04 16:48:39.613050999 -0600
+@@ -39,7 +39,7 @@
+ #include <linux/input/mt.h>
+ #include <linux/input/edt-ft5x06.h>
+ 
+-#define MAX_SUPPORT_POINTS		5
++#define MAX_SUPPORT_POINTS		1
+ 
+ #define WORK_REGISTER_THRESHOLD		0x00
+ #define WORK_REGISTER_REPORT_RATE	0x08
+@@ -242,8 +242,12 @@
+ 		if (!down)
+ 			continue;
+ 
+-		input_report_abs(tsdata->input, ABS_MT_POSITION_X, x);
+-		input_report_abs(tsdata->input, ABS_MT_POSITION_Y, y);
++		// *4 is a scale factor for RFMicron's Hermes
++                input_report_abs(tsdata->input, ABS_MT_POSITION_X, x * 4);
++		// * 34 / 5 is a scale factor for RFMicron's Hermes
++                input_report_abs(tsdata->input, ABS_MT_POSITION_Y, y * 34 / 5);
++		// Pressure event for RFMicron's Hermes
++		input_report_abs(tsdata->input, ABS_PRESSURE, 200);
+ 	}
+ 
+ 	input_mt_report_pointer_emulation(tsdata->input, true);
