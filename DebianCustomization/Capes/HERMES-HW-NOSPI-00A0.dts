@@ -32,7 +32,7 @@
 		"P9.18",	/* i2c1_sda */
 		"P9.17",	/* i2c1_scl */
 		"P8.13",	/* pwm: ehrpwm2B */
-		"P8.10",	/* capacitive touchscreen interrupt: gpio2_4 */
+		/* "P8.10", */	/* capacitive touchscreen interrupt: gpio2_4 */
 
 		/* "P9.31", */	/* spi1_sclk */
 		/* "P9.29", */	/* spi1_d0 */
@@ -52,8 +52,8 @@
 		"dcan1",
 		"i2c1",
 		"ehrpwm2B",
-		"spi1",
-		"gpio2_4",
+		/* "spi1", */
+		/* "gpio2_4", */
 		"tscadc";
 
 	fragment@0 {
@@ -91,11 +91,11 @@
 				pinctrl-single,pins = <0x024  0x4>; /* P8_13 (ZCZ ball T10) | MODE 4 */
 			};
 
-			edt_ft5406_ts_pins: pinmux_edt_ft5406_ts_pins {
-				pinctrl-single,pins = <
-				0x098  0x37  /* gpmc_wen.gpio2_4  (PIN_INPUT_PULLUP | MUX_MODE7) */
-			    >;
-			};
+			/* edt_ft5406_ts_pins: pinmux_edt_ft5406_ts_pins { */
+			/* 	pinctrl-single,pins = < */
+			/* 	0x098  0x37 */  /* gpmc_wen.gpio2_4  (PIN_INPUT_PULLUP | MUX_MODE7) */
+			/*     >; */
+			/* }; */
 
 			/* bb_spi1_pins: pinmux_bb_spi1_pins { */
 			/* 	pinctrl-single,pins = < */
@@ -224,30 +224,29 @@
 		};
 	};
 
-       fragment@14 {
-               target = <&i2c2>;
+       /* fragment@14 { */
+       /*         target = <&i2c2>; */
 
-               __overlay__ {
+       /*         __overlay__ { */
 
 		       /* needed to avoid gripping by DTC */
-		       #address-cells = <1>;
-		       #size-cells = <0>;
-			newhaven@38 {
-        			status = "okay";
-       	 			compatible = "edt,edt-ft5x06";
-        			pinctrl-names = "default";
-        			pinctrl-0 = <&edt_ft5406_ts_pins>;
-				reg = <0x38>;
-				interrupt-parent = <&gpio3>;
-				interrupts = <4>;
-        			touchscreen-size-x = <800>;
-        			touchscreen-size-y = <480>;
-			};
+	/* 	       #address-cells = <1>; */
+	/* 	       #size-cells = <0>; */
+	/* 		newhaven@38 { */
+        /* 			status = "okay"; */
+       	/*  			compatible = "edt,edt-ft5x06"; */
+        /* 			pinctrl-names = "default"; */
+        /* 			pinctrl-0 = <&edt_ft5406_ts_pins>; */
+	/* 			reg = <0x38>; */
+	/* 			interrupt-parent = <&gpio3>; */
+	/* 			interrupts = <4>; */
+        /* 			touchscreen-size-x = <800>; */
+        /* 			touchscreen-size-y = <480>; */
+	/* 		}; */
+        /*        }; */
+	/* };  */
 
-               };
-	}; 
-
-	fragment@15 {
+	fragment@14 {
 		target = <&ocp>;
 		__overlay__ {
 			/* avoid stupid warning */
