@@ -45,6 +45,7 @@ class KitModel : public QObject
 		int PRCBandFreqs[16];
 		int JPNBandFreqs[6];
 		GPIO *gpio7;
+		bool abort;
 	public:
 		KitModel();
 		FreqBandEnum currentFreqBand;
@@ -84,7 +85,11 @@ class KitModel : public QObject
 		int findTags(int numInventories, QString measurementType);
 		int searchForTempTags();
 		int searchForMoistTags();
+		int searchForTempTags(int maxSearchTime);
+		int searchForMoistTags(int maxSearchTime);
 		int setSelectsForReading();
+		int getTempMaxPowerLevel();
+		int getMoistMaxPowerLevel();
 		int writeDataToTag(QString epc, char bankCode, int address, QString dataHexString);
 		int readTags(int numInventories, QString measurementType);
 		bool validTempTagsInList();
@@ -102,6 +107,7 @@ class KitModel : public QObject
 		int exportMoistLog(QFile *file);
 		int exportTempLog(QFile *file);
 		void continuousWave(char timeInSeconds);
+		void setAbort(bool status);
 	signals:
 		void updateTempTagsSignal(QList<SensorTag>);
 		void updateTempTagSelectionsSignal();

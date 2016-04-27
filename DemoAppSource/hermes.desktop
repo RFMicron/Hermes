@@ -2,7 +2,7 @@
 Name=Hermes
 Comment=Development Kit
 Exec=/home/debian/hermes/hermes
-Icon=/home/debian/hermes/images/ONAppLogo.jpg
+Icon=/home/debian/hermes/images/RFMAppLogo.png
 Terminal=false
 Type=Application
 Categories=Utility

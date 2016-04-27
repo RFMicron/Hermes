@@ -2441,10 +2441,6 @@ unsigned short AMSRadonReader::calculateCRC(const void *buf, unsigned short len)
 		crc = (crc << 8) ^ crc16OffsetTable[((crc >> 8) ^ *sbuf++) & 0x00FF];
 	return crc;
 }
-short AMSRadonReader::shutdown()
-{
-	return 0;
-}
 TagData::TagData()
 {
 	clear();	

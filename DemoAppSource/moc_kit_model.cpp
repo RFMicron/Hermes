@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'kit_model.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.3.2)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.5.1)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -13,7 +13,7 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'kit_model.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.3.2. It"
+#error "This file was generated using the moc from 5.5.1. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -21,25 +21,26 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_KitModel_t {
     QByteArrayData data[10];
-    char stringdata[182];
+    char stringdata0[182];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    qptrdiff(offsetof(qt_meta_stringdata_KitModel_t, stringdata) + ofs \
+    qptrdiff(offsetof(qt_meta_stringdata_KitModel_t, stringdata0) + ofs \
         - idx * sizeof(QByteArrayData)) \
     )
 static const qt_meta_stringdata_KitModel_t qt_meta_stringdata_KitModel = {
     {
-QT_MOC_LITERAL(0, 0, 8),
-QT_MOC_LITERAL(1, 9, 20),
-QT_MOC_LITERAL(2, 30, 0),
-QT_MOC_LITERAL(3, 31, 16),
-QT_MOC_LITERAL(4, 48, 29),
-QT_MOC_LITERAL(5, 78, 21),
-QT_MOC_LITERAL(6, 100, 30),
-QT_MOC_LITERAL(7, 131, 19),
-QT_MOC_LITERAL(8, 151, 17),
-QT_MOC_LITERAL(9, 169, 12)
+QT_MOC_LITERAL(0, 0, 8), // "KitModel"
+QT_MOC_LITERAL(1, 9, 20), // "updateTempTagsSignal"
+QT_MOC_LITERAL(2, 30, 0), // ""
+QT_MOC_LITERAL(3, 31, 16), // "QList<SensorTag>"
+QT_MOC_LITERAL(4, 48, 29), // "updateTempTagSelectionsSignal"
+QT_MOC_LITERAL(5, 78, 21), // "updateMoistTagsSignal"
+QT_MOC_LITERAL(6, 100, 30), // "updateMoistTagSelectionsSignal"
+QT_MOC_LITERAL(7, 131, 19), // "antennaTuningSignal"
+QT_MOC_LITERAL(8, 151, 17), // "bandChangedSignal"
+QT_MOC_LITERAL(9, 169, 12) // "FreqBandEnum"
+
     },
     "KitModel\0updateTempTagsSignal\0\0"
     "QList<SensorTag>\0updateTempTagSelectionsSignal\0"
@@ -86,6 +87,7 @@ void KitModel::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
         KitModel *_t = static_cast<KitModel *>(_o);
+        Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->updateTempTagsSignal((*reinterpret_cast< QList<SensorTag>(*)>(_a[1]))); break;
         case 1: _t->updateTempTagSelectionsSignal(); break;
@@ -157,7 +159,7 @@ void KitModel::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
 
 const QMetaObject KitModel::staticMetaObject = {
     { &QObject::staticMetaObject, qt_meta_stringdata_KitModel.data,
-      qt_meta_data_KitModel,  qt_static_metacall, 0, 0}
+      qt_meta_data_KitModel,  qt_static_metacall, Q_NULLPTR, Q_NULLPTR}
 };
 
 
@@ -168,8 +170,8 @@ const QMetaObject *KitModel::metaObject() const
 
 void *KitModel::qt_metacast(const char *_clname)
 {
-    if (!_clname) return 0;
-    if (!strcmp(_clname, qt_meta_stringdata_KitModel.stringdata))
+    if (!_clname) return Q_NULLPTR;
+    if (!strcmp(_clname, qt_meta_stringdata_KitModel.stringdata0))
         return static_cast<void*>(const_cast< KitModel*>(this));
     return QObject::qt_metacast(_clname);
 }
@@ -194,40 +196,40 @@ int KitModel::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 // SIGNAL 0
 void KitModel::updateTempTagsSignal(QList<SensorTag> _t1)
 {
-    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 
 // SIGNAL 1
 void KitModel::updateTempTagSelectionsSignal()
 {
-    QMetaObject::activate(this, &staticMetaObject, 1, 0);
+    QMetaObject::activate(this, &staticMetaObject, 1, Q_NULLPTR);
 }
 
 // SIGNAL 2
 void KitModel::updateMoistTagsSignal(QList<SensorTag> _t1)
 {
-    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 2, _a);
 }
 
 // SIGNAL 3
 void KitModel::updateMoistTagSelectionsSignal()
 {
-    QMetaObject::activate(this, &staticMetaObject, 3, 0);
+    QMetaObject::activate(this, &staticMetaObject, 3, Q_NULLPTR);
 }
 
 // SIGNAL 4
 void KitModel::antennaTuningSignal(int _t1, int _t2)
 {
-    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
+    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
     QMetaObject::activate(this, &staticMetaObject, 4, _a);
 }
 
 // SIGNAL 5
 void KitModel::bandChangedSignal(FreqBandEnum _t1)
 {
-    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 5, _a);
 }
 QT_END_MOC_NAMESPACE

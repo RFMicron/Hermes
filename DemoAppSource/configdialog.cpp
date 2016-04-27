@@ -110,6 +110,7 @@ HelpDialog::HelpDialog(KitModel *model, KitController *controller, QString helpT
 	mainLayout->addLayout(buttonsLayout);
 	setLayout(mainLayout);
 	setWindowTitle(tr("Help"));
+	setWindowIcon(QIcon(APPLICATION_ICON));
 }
 void HelpDialog::changePage(QListWidgetItem *current, QListWidgetItem *previous)
 {

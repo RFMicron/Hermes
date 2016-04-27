@@ -30,8 +30,6 @@ enum FreqBandEnum {FCC, ETSI, PRC, JAPAN, FCC_center, ETSI_center};
 #define ANIMATED_ICON ":/images/RFMAnimatedLogo.gif"
 #define MAIN_PAGE_ICON ":/images/RFMMainPageLogo.bmp"
 
-
-
 class KitModel;
 class GUIView;
 class RUIView;
@@ -48,7 +46,6 @@ class KitController
 		KitController(KitModel *model, int &argc, char *argv[]);
 		int initialize();
 		int run();
-		int startTempCollection();
 		short launchRUI(QString interfaceType);
 		void stopRUI();
 		RUIThread* getRUIThreadPointer();
@@ -57,6 +54,8 @@ class KitController
 		double measureTempCodeForCalibration();
 		void searchForTempTags();
 		void searchForMoistureTags();
+		void searchForTempTags(int maxSearchTime);
+		void searchForMoistureTags(int maxSearchTime);
 		void measureTempTags();
 		void measureMoistureTags();
 		int clearTempTags();
@@ -75,6 +74,5 @@ class KitController
 		int setMoistThreshold(int threshold);
 		int setMoistAboveThreshold(bool above);
 		int setBandRegion(FreqBandEnum band);
-		int shutdown();
 };
 #endif

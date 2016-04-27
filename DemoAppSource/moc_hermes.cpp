@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'hermes.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.3.2)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.5.1)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -13,7 +13,7 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'hermes.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.3.2. It"
+#error "This file was generated using the moc from 5.5.1. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -21,18 +21,19 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Hermes_t {
     QByteArrayData data[3];
-    char stringdata[26];
+    char stringdata0[26];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    qptrdiff(offsetof(qt_meta_stringdata_Hermes_t, stringdata) + ofs \
+    qptrdiff(offsetof(qt_meta_stringdata_Hermes_t, stringdata0) + ofs \
         - idx * sizeof(QByteArrayData)) \
     )
 static const qt_meta_stringdata_Hermes_t qt_meta_stringdata_Hermes = {
     {
-QT_MOC_LITERAL(0, 0, 6),
-QT_MOC_LITERAL(1, 7, 17),
-QT_MOC_LITERAL(2, 25, 0)
+QT_MOC_LITERAL(0, 0, 6), // "Hermes"
+QT_MOC_LITERAL(1, 7, 17), // "quitButtonClicked"
+QT_MOC_LITERAL(2, 25, 0) // ""
+
     },
     "Hermes\0quitButtonClicked\0"
 };
@@ -64,6 +65,7 @@ void Hermes::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
         Hermes *_t = static_cast<Hermes *>(_o);
+        Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->quitButtonClicked(); break;
         default: ;
@@ -74,7 +76,7 @@ void Hermes::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
 
 const QMetaObject Hermes::staticMetaObject = {
     { &QWizard::staticMetaObject, qt_meta_stringdata_Hermes.data,
-      qt_meta_data_Hermes,  qt_static_metacall, 0, 0}
+      qt_meta_data_Hermes,  qt_static_metacall, Q_NULLPTR, Q_NULLPTR}
 };
 
 
@@ -85,8 +87,8 @@ const QMetaObject *Hermes::metaObject() const
 
 void *Hermes::qt_metacast(const char *_clname)
 {
-    if (!_clname) return 0;
-    if (!strcmp(_clname, qt_meta_stringdata_Hermes.stringdata))
+    if (!_clname) return Q_NULLPTR;
+    if (!strcmp(_clname, qt_meta_stringdata_Hermes.stringdata0))
         return static_cast<void*>(const_cast< Hermes*>(this));
     return QWizard::qt_metacast(_clname);
 }
@@ -109,20 +111,21 @@ int Hermes::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 struct qt_meta_stringdata_MainPage_t {
     QByteArrayData data[5];
-    char stringdata[87];
+    char stringdata0[87];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    qptrdiff(offsetof(qt_meta_stringdata_MainPage_t, stringdata) + ofs \
+    qptrdiff(offsetof(qt_meta_stringdata_MainPage_t, stringdata0) + ofs \
         - idx * sizeof(QByteArrayData)) \
     )
 static const qt_meta_stringdata_MainPage_t qt_meta_stringdata_MainPage = {
     {
-QT_MOC_LITERAL(0, 0, 8),
-QT_MOC_LITERAL(1, 9, 21),
-QT_MOC_LITERAL(2, 31, 0),
-QT_MOC_LITERAL(3, 32, 25),
-QT_MOC_LITERAL(4, 58, 28)
+QT_MOC_LITERAL(0, 0, 8), // "MainPage"
+QT_MOC_LITERAL(1, 9, 21), // "tempDemoButtonClicked"
+QT_MOC_LITERAL(2, 31, 0), // ""
+QT_MOC_LITERAL(3, 32, 25), // "moistureDemoButtonClicked"
+QT_MOC_LITERAL(4, 58, 28) // "remoteOperationButtonClicked"
+
     },
     "MainPage\0tempDemoButtonClicked\0\0"
     "moistureDemoButtonClicked\0"
@@ -160,6 +163,7 @@ void MainPage::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
         MainPage *_t = static_cast<MainPage *>(_o);
+        Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->tempDemoButtonClicked(); break;
         case 1: _t->moistureDemoButtonClicked(); break;
@@ -172,7 +176,7 @@ void MainPage::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
 
 const QMetaObject MainPage::staticMetaObject = {
     { &QWizardPage::staticMetaObject, qt_meta_stringdata_MainPage.data,
-      qt_meta_data_MainPage,  qt_static_metacall, 0, 0}
+      qt_meta_data_MainPage,  qt_static_metacall, Q_NULLPTR, Q_NULLPTR}
 };
 
 
@@ -183,8 +187,8 @@ const QMetaObject *MainPage::metaObject() const
 
 void *MainPage::qt_metacast(const char *_clname)
 {
-    if (!_clname) return 0;
-    if (!strcmp(_clname, qt_meta_stringdata_MainPage.stringdata))
+    if (!_clname) return Q_NULLPTR;
+    if (!strcmp(_clname, qt_meta_stringdata_MainPage.stringdata0))
         return static_cast<void*>(const_cast< MainPage*>(this));
     return QWizardPage::qt_metacast(_clname);
 }
@@ -207,30 +211,31 @@ int MainPage::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 struct qt_meta_stringdata_TempDemoPage_t {
     QByteArrayData data[15];
-    char stringdata[291];
+    char stringdata0[291];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    qptrdiff(offsetof(qt_meta_stringdata_TempDemoPage_t, stringdata) + ofs \
+    qptrdiff(offsetof(qt_meta_stringdata_TempDemoPage_t, stringdata0) + ofs \
         - idx * sizeof(QByteArrayData)) \
     )
 static const qt_meta_stringdata_TempDemoPage_t qt_meta_stringdata_TempDemoPage = {
     {
-QT_MOC_LITERAL(0, 0, 12),
-QT_MOC_LITERAL(1, 13, 23),
-QT_MOC_LITERAL(2, 37, 0),
-QT_MOC_LITERAL(3, 38, 26),
-QT_MOC_LITERAL(4, 65, 16),
-QT_MOC_LITERAL(5, 82, 31),
-QT_MOC_LITERAL(6, 114, 23),
-QT_MOC_LITERAL(7, 138, 17),
-QT_MOC_LITERAL(8, 156, 19),
-QT_MOC_LITERAL(9, 176, 24),
-QT_MOC_LITERAL(10, 201, 13),
-QT_MOC_LITERAL(11, 215, 18),
-QT_MOC_LITERAL(12, 234, 17),
-QT_MOC_LITERAL(13, 252, 18),
-QT_MOC_LITERAL(14, 271, 19)
+QT_MOC_LITERAL(0, 0, 12), // "TempDemoPage"
+QT_MOC_LITERAL(1, 13, 23), // "updateTagSelectionsSlot"
+QT_MOC_LITERAL(2, 37, 0), // ""
+QT_MOC_LITERAL(3, 38, 26), // "updateTempOutputLabelsSlot"
+QT_MOC_LITERAL(4, 65, 16), // "QList<SensorTag>"
+QT_MOC_LITERAL(5, 82, 31), // "measurementDetailsButtonClicked"
+QT_MOC_LITERAL(6, 114, 23), // "mainScreenButtonClicked"
+QT_MOC_LITERAL(7, 138, 17), // "helpButtonClicked"
+QT_MOC_LITERAL(8, 156, 19), // "configButtonClicked"
+QT_MOC_LITERAL(9, 176, 24), // "calibrationButtonClicked"
+QT_MOC_LITERAL(10, 201, 13), // "periodChanged"
+QT_MOC_LITERAL(11, 215, 18), // "startButtonClicked"
+QT_MOC_LITERAL(12, 234, 17), // "stopButtonClicked"
+QT_MOC_LITERAL(13, 252, 18), // "clearButtonClicked"
+QT_MOC_LITERAL(14, 271, 19) // "exportButtonClicked"
+
     },
     "TempDemoPage\0updateTagSelectionsSlot\0"
     "\0updateTempOutputLabelsSlot\0"
@@ -291,6 +296,7 @@ void TempDemoPage::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
         TempDemoPage *_t = static_cast<TempDemoPage *>(_o);
+        Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->updateTagSelectionsSlot(); break;
         case 1: _t->updateTempOutputLabelsSlot((*reinterpret_cast< QList<SensorTag>(*)>(_a[1]))); break;
@@ -322,7 +328,7 @@ void TempDemoPage::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
 
 const QMetaObject TempDemoPage::staticMetaObject = {
     { &QWizardPage::staticMetaObject, qt_meta_stringdata_TempDemoPage.data,
-      qt_meta_data_TempDemoPage,  qt_static_metacall, 0, 0}
+      qt_meta_data_TempDemoPage,  qt_static_metacall, Q_NULLPTR, Q_NULLPTR}
 };
 
 
@@ -333,8 +339,8 @@ const QMetaObject *TempDemoPage::metaObject() const
 
 void *TempDemoPage::qt_metacast(const char *_clname)
 {
-    if (!_clname) return 0;
-    if (!strcmp(_clname, qt_meta_stringdata_TempDemoPage.stringdata))
+    if (!_clname) return Q_NULLPTR;
+    if (!strcmp(_clname, qt_meta_stringdata_TempDemoPage.stringdata0))
         return static_cast<void*>(const_cast< TempDemoPage*>(this));
     return QWizardPage::qt_metacast(_clname);
 }
@@ -357,29 +363,30 @@ int TempDemoPage::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 struct qt_meta_stringdata_MoistureDemoPage_t {
     QByteArrayData data[14];
-    char stringdata[271];
+    char stringdata0[271];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    qptrdiff(offsetof(qt_meta_stringdata_MoistureDemoPage_t, stringdata) + ofs \
+    qptrdiff(offsetof(qt_meta_stringdata_MoistureDemoPage_t, stringdata0) + ofs \
         - idx * sizeof(QByteArrayData)) \
     )
 static const qt_meta_stringdata_MoistureDemoPage_t qt_meta_stringdata_MoistureDemoPage = {
     {
-QT_MOC_LITERAL(0, 0, 16),
-QT_MOC_LITERAL(1, 17, 23),
-QT_MOC_LITERAL(2, 41, 0),
-QT_MOC_LITERAL(3, 42, 27),
-QT_MOC_LITERAL(4, 70, 16),
-QT_MOC_LITERAL(5, 87, 31),
-QT_MOC_LITERAL(6, 119, 23),
-QT_MOC_LITERAL(7, 143, 17),
-QT_MOC_LITERAL(8, 161, 19),
-QT_MOC_LITERAL(9, 181, 13),
-QT_MOC_LITERAL(10, 195, 18),
-QT_MOC_LITERAL(11, 214, 17),
-QT_MOC_LITERAL(12, 232, 18),
-QT_MOC_LITERAL(13, 251, 19)
+QT_MOC_LITERAL(0, 0, 16), // "MoistureDemoPage"
+QT_MOC_LITERAL(1, 17, 23), // "updateTagSelectionsSlot"
+QT_MOC_LITERAL(2, 41, 0), // ""
+QT_MOC_LITERAL(3, 42, 27), // "updateMoistOutputLabelsSlot"
+QT_MOC_LITERAL(4, 70, 16), // "QList<SensorTag>"
+QT_MOC_LITERAL(5, 87, 31), // "measurementDetailsButtonClicked"
+QT_MOC_LITERAL(6, 119, 23), // "mainScreenButtonClicked"
+QT_MOC_LITERAL(7, 143, 17), // "helpButtonClicked"
+QT_MOC_LITERAL(8, 161, 19), // "configButtonClicked"
+QT_MOC_LITERAL(9, 181, 13), // "periodChanged"
+QT_MOC_LITERAL(10, 195, 18), // "startButtonClicked"
+QT_MOC_LITERAL(11, 214, 17), // "stopButtonClicked"
+QT_MOC_LITERAL(12, 232, 18), // "clearButtonClicked"
+QT_MOC_LITERAL(13, 251, 19) // "exportButtonClicked"
+
     },
     "MoistureDemoPage\0updateTagSelectionsSlot\0"
     "\0updateMoistOutputLabelsSlot\0"
@@ -437,6 +444,7 @@ void MoistureDemoPage::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
         MoistureDemoPage *_t = static_cast<MoistureDemoPage *>(_o);
+        Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->updateTagSelectionsSlot(); break;
         case 1: _t->updateMoistOutputLabelsSlot((*reinterpret_cast< QList<SensorTag>(*)>(_a[1]))); break;
@@ -467,7 +475,7 @@ void MoistureDemoPage::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int
 
 const QMetaObject MoistureDemoPage::staticMetaObject = {
     { &QWizardPage::staticMetaObject, qt_meta_stringdata_MoistureDemoPage.data,
-      qt_meta_data_MoistureDemoPage,  qt_static_metacall, 0, 0}
+      qt_meta_data_MoistureDemoPage,  qt_static_metacall, Q_NULLPTR, Q_NULLPTR}
 };
 
 
@@ -478,8 +486,8 @@ const QMetaObject *MoistureDemoPage::metaObject() const
 
 void *MoistureDemoPage::qt_metacast(const char *_clname)
 {
-    if (!_clname) return 0;
-    if (!strcmp(_clname, qt_meta_stringdata_MoistureDemoPage.stringdata))
+    if (!_clname) return Q_NULLPTR;
+    if (!strcmp(_clname, qt_meta_stringdata_MoistureDemoPage.stringdata0))
         return static_cast<void*>(const_cast< MoistureDemoPage*>(this));
     return QWizardPage::qt_metacast(_clname);
 }
@@ -502,24 +510,25 @@ int MoistureDemoPage::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 struct qt_meta_stringdata_RemoteOperationPage_t {
     QByteArrayData data[9];
-    char stringdata[121];
+    char stringdata0[121];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    qptrdiff(offsetof(qt_meta_stringdata_RemoteOperationPage_t, stringdata) + ofs \
+    qptrdiff(offsetof(qt_meta_stringdata_RemoteOperationPage_t, stringdata0) + ofs \
         - idx * sizeof(QByteArrayData)) \
     )
 static const qt_meta_stringdata_RemoteOperationPage_t qt_meta_stringdata_RemoteOperationPage = {
     {
-QT_MOC_LITERAL(0, 0, 19),
-QT_MOC_LITERAL(1, 20, 15),
-QT_MOC_LITERAL(2, 36, 0),
-QT_MOC_LITERAL(3, 37, 4),
-QT_MOC_LITERAL(4, 42, 5),
-QT_MOC_LITERAL(5, 48, 18),
-QT_MOC_LITERAL(6, 67, 17),
-QT_MOC_LITERAL(7, 85, 17),
-QT_MOC_LITERAL(8, 103, 17)
+QT_MOC_LITERAL(0, 0, 19), // "RemoteOperationPage"
+QT_MOC_LITERAL(1, 20, 15), // "outputToConsole"
+QT_MOC_LITERAL(2, 36, 0), // ""
+QT_MOC_LITERAL(3, 37, 4), // "text"
+QT_MOC_LITERAL(4, 42, 5), // "color"
+QT_MOC_LITERAL(5, 48, 18), // "startButtonClicked"
+QT_MOC_LITERAL(6, 67, 17), // "stopButtonClicked"
+QT_MOC_LITERAL(7, 85, 17), // "helpButtonClicked"
+QT_MOC_LITERAL(8, 103, 17) // "mainButtonClicked"
+
     },
     "RemoteOperationPage\0outputToConsole\0"
     "\0text\0color\0startButtonClicked\0"
@@ -562,6 +571,7 @@ void RemoteOperationPage::qt_static_metacall(QObject *_o, QMetaObject::Call _c, 
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
         RemoteOperationPage *_t = static_cast<RemoteOperationPage *>(_o);
+        Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->outputToConsole((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
         case 1: _t->startButtonClicked(); break;
@@ -575,7 +585,7 @@ void RemoteOperationPage::qt_static_metacall(QObject *_o, QMetaObject::Call _c, 
 
 const QMetaObject RemoteOperationPage::staticMetaObject = {
     { &QWizardPage::staticMetaObject, qt_meta_stringdata_RemoteOperationPage.data,
-      qt_meta_data_RemoteOperationPage,  qt_static_metacall, 0, 0}
+      qt_meta_data_RemoteOperationPage,  qt_static_metacall, Q_NULLPTR, Q_NULLPTR}
 };
 
 
@@ -586,8 +596,8 @@ const QMetaObject *RemoteOperationPage::metaObject() const
 
 void *RemoteOperationPage::qt_metacast(const char *_clname)
 {
-    if (!_clname) return 0;
-    if (!strcmp(_clname, qt_meta_stringdata_RemoteOperationPage.stringdata))
+    if (!_clname) return Q_NULLPTR;
+    if (!strcmp(_clname, qt_meta_stringdata_RemoteOperationPage.stringdata0))
         return static_cast<void*>(const_cast< RemoteOperationPage*>(this));
     return QWizardPage::qt_metacast(_clname);
 }

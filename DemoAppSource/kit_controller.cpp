@@ -87,6 +87,8 @@ short KitController::launchRUI(QString interfaceType)
 			interface = Interface::I2C;
 		else if(interfaceType == "SPI")
 			interface = Interface::SPI;
+		else if(interfaceType == "ZIGBEE")
+			interface = Interface::ZIGBEE;
 		else
 		{
 			qDebug("invalid interface provided\n");
@@ -95,7 +97,7 @@ short KitController::launchRUI(QString interfaceType)
 		if(RUI->setType(interface) == 0)
 		{
 			qDebug("set RUI type ok\n");
-			RUI->setMode(Interface::TEST);
+			RUI->setMode(Interface::NORMAL);
 			qDebug("set RUI mode ok\n");
 			RUI->start();
 		}
@@ -129,11 +131,6 @@ void KitController::turnReaderOff()
 {
 	model->turnReaderOff();
 }
-int KitController::startTempCollection()
-{
-	model->measureTempTags();
-	return 0;
-}
 int KitController::clearTempTags()
 {
 	model->clearTags("Temperature");
@@ -155,6 +152,14 @@ void KitController::searchForTempTags()
 void KitController::searchForMoistureTags()
 {
 	model->searchForMoistTags();
+}
+void KitController::searchForTempTags(int maxSearchTime)
+{
+	model->searchForTempTags(maxSearchTime);
+}
+void KitController::searchForMoistureTags(int maxSearchTime)
+{
+	model->searchForMoistTags(maxSearchTime);
 }
 void KitController::measureTempTags()
 {
@@ -257,9 +262,5 @@ int KitController::setMoistAboveThreshold(bool above)
 		model->wetAbove=false;
 		qDebug("wetAbove: false");
 	}
-	return 0;
-}
-int KitController::shutdown()
-{
 	return 0;
 }

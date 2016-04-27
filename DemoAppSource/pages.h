@@ -72,7 +72,6 @@ class OnePointTempCalTab : public QWidget
 		QTextEdit *code1TextEdit;
 	public:
 		explicit OnePointTempCalTab(KitModel *model, KitController *controller, QWidget *parent = 0);
-		bool abortRequested();
 	private slots:
 		void readTempCodeButtonClicked();
 		void writeCalButtonClicked();
@@ -93,7 +92,6 @@ class TwoPointTempCalTab : public QWidget
 		bool readingCode1;
 	public:
 		explicit TwoPointTempCalTab(KitModel *model, KitController *controller, QWidget *parent = 0);
-		bool abortRequested();
 	private slots:
 		void readTempCode1ButtonClicked();
 		void readTempCode2ButtonClicked();

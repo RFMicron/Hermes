@@ -929,10 +929,6 @@ OnePointTempCalTab::OnePointTempCalTab(KitModel *model, KitController *controlle
 			this, SLOT(writeCalButtonClicked()));
 	setLayout(highestLayout);
 }
-bool OnePointTempCalTab::abortRequested()
-{
-	return thread->abortRequested();
-}
 void OnePointTempCalTab::readTempCodeButtonClicked()
 {
 	qDebug("Read Temp Code button clicked");
@@ -1151,10 +1147,6 @@ void TwoPointTempCalTab::writeCalButtonClicked()
 			msgBox.exec();
 		}
 	}
-}
-bool TwoPointTempCalTab::abortRequested()
-{
-	return thread->abortRequested();
 }
 void TwoPointTempCalTab::tempCodeMeasuredSlot(float tempCode)
 {

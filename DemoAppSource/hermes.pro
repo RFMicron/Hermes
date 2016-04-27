@@ -20,6 +20,7 @@ HEADERS += configdialog.h \
            can.h \
            i2c_bridge.h \
            spi_bridge.h \
+           zigbee.h \
            util.h \
            gpio.h \
            rui_thread.h \
@@ -43,6 +44,7 @@ SOURCES += configdialog.cpp \
            gpio.cpp \
            i2c_bridge.cpp \
            spi_bridge.cpp \
+           zigbee.cpp \
            rui_thread.cpp \
 	   interfaces.cpp \
 	   hermes.cpp \

@@ -88,7 +88,6 @@ class TempDemoPage : public QWizardPage
 	Q_OBJECT
 	public:
 		TempDemoPage(KitModel *model, KitController *controller, QWidget *parent = 0);
-		bool abortRequested();
 		CalibrationDialog *calibrationDialog;
 	private:
 		KitModel *model;
@@ -133,7 +132,6 @@ class MoistureDemoPage : public QWizardPage
 	Q_OBJECT
 	public:
 		MoistureDemoPage(KitModel *model, KitController *controller, QWidget *parent = 0);
-		bool abortRequested();
 	private:
 		KitModel *model;
 		KitController *controller;

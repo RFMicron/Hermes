@@ -7,7 +7,7 @@
 
 #define SET_MESSAGE_PAYLOAD(buf, index, value) do { buf[index] = value; } while ( 0 )
 #define GET_MESSAGE_PAYLOAD(buf, index) buf[index]
-
+#define MAX_SEARCH_TIME 30000 //search for tags for upto 30 seconds
 #define MSG_HEADER_SIZE 6
 #define EPCMAXLENGTH 32
 #define TIDMAXLENGTH 12
@@ -35,16 +35,40 @@
 #define SENSOR_VALUE_RESP 11
 #define ONCHIPRSSI_VALUE_RESP 12
 #define DONE_RESP 13
+#define GET_ZIGBEE_DATA_FRAME_STATUS(buf)  buf[1]
+#define GET_ZIGBEE_DATA_FRAME_DELIVERY_ID(buf) buf[1]
+#define GET_ZIGBEE_DATA_FRAME_DELIVERY_STATUS(buf) buf[5]
+#define GET_ZIGBEE_DATA_FRAME_CLUSTER_ID(buf) buf[13] << 8 | buf[14]
+#define GET_ZIGBEE_DATA_FRAME_ENDPOINT_REQUEST_ID(buf) buf[18]
+#define GET_ZIGBEE_DATA_FRAME_SIMPLE_DESCRIPTOR_REQUEST_ID(buf) buf[18]
+#define GET_ZIGBEE_TEMP_MEASUREMENT_REQUEST_CONTROL_FRAME(buf) buf[18]
+#define GET_ZIGBEE_TEMP_MEASUREMENT_REQUEST_FRAME_ID(buf) buf[19]
+#define SET_ZIGBEE_FRAME_PAYLOAD(buf, index, value) do { buf[index] = value; } while ( 0 )
+#define MODEM_STATUS_FRAME 0x8A
+#define TRANSMIT_STATUS_FRAME  0x8B
+#define EXPLICIT_RX_INDICATOR_FRAME 0x91
+#define ACTIVE_ENDPOINTS_REQUEST_FRAME 0x0005
+#define SIMPLE_DESCRIPTOR_REQUEST_FRAME 0x0004
+#define TEMPERATURE_MEASUREMENT_REQUEST_FRAME 0x0402
+#define ZIGBEE_HAVE_JOINED_NETWORK 0x02
+#define ZIGBEE_FRAME_HEADER_SIZE 3 
+#define ANNOUNCE_DEVICE_FRAME_SIZE  32
+#define REPORT_ENDPOINT_FRAME_SIZE 26
+#define SIMPLE_DESCRIPTOR_REQUEST_FRAME_SIZE 40
+#define TEMP_MEASUREMENT_REQUEST_FRAME_SIZE 26
+#define ZIGBEE_CHECKSUM_SIZE 1
+#define ZIGBEE_TRANSMISSION_SUCCESSFUL 0
 
 RUIThread::RUIThread(QObject *parent) : QThread(parent)
 {
 	abort = false;
 	mode = Interface::NORMAL;
 }
-void RUIThread::initialize(KitController *controller, KitModel *model)
+void RUIThread::initialize(KitController *controller, KitModel *model, GPIO *xBeeResetLine)
 {
 	this->controller = controller;
 	this->model = model;
+	this->xBeeResetLine = xBeeResetLine;
 }
 short RUIThread::setType(Interface::InterfaceType interface)
 {
@@ -74,6 +98,7 @@ short RUIThread::startInterface()
 	{
 		qDebug("starting interface\n");
 		abort = false;
+		model->setAbort(false);
 		start(LowPriority);
 	}
 	else
@@ -84,6 +109,7 @@ void RUIThread::stopInterface()
 {
 	mutex.lock();
 	abort = true;
+	model->setAbort(true);
 	mutex.unlock();
 	wait();	
 	if(interface.getType() == Interface::TCP)
@@ -104,6 +130,30 @@ void RUIThread::run()
 	bool notConnectedMsgDisplayed = false;
 	qDebug("RUI Thread running...\n");
 	Interface::InterfaceType interfaceType = interface.getType();
+	if(interfaceType == Interface::ZIGBEE)
+	{
+		if(interface.configureZigBee() != 0)
+		{
+			qDebug("unable to configure ZigBee!\n");
+			sprintf(msg, "Unable to configure ZigBee, interface failed!\n");
+			emit outputToConsole(QString(msg), QString("Red"));
+			return;
+		}
+		else
+		{
+			qDebug("configured ZigBee! Resetting XBEE module...\n");
+			sprintf(msg, "Configured ZigBee! Resetting XBEE module...\n");
+			emit outputToConsole(QString(msg), QString("Red"));
+			xBeeResetLine->setValue(GPIO::LOW);
+			QThread::msleep(100);
+			xBeeResetLine->setValue(GPIO::HIGH);
+			qDebug("XBEE module reset!\n");
+			sprintf(msg, "XBEE module reset!\n");
+			emit outputToConsole(QString(msg), QString("Red"));
+		}
+	}
+	sprintf(msg, "Interface running, listening for commands...\n");
+	emit outputToConsole(QString(msg), QString("Red"));
 	while(abort != true)
 	{
 		if(interfaceType == Interface::TCP)
@@ -135,6 +185,8 @@ void RUIThread::run()
 				interface.keepConnectionToClient();
 			if(interfaceType == Interface::CAN)
 				status = processCANCommand(command, payload, payloadLength, &message, msgLength);
+			else if(interfaceType == Interface::ZIGBEE)
+				status = processZigBeeCommand(command, payload, payloadLength, &message, msgLength);
 			else
 				status = processCommand(command, payload, payloadLength, &message, msgLength);
 			QThread::yieldCurrentThread();	
@@ -144,6 +196,283 @@ void RUIThread::run()
 	sprintf(msg, "Interface stopped\n");
 	emit outputToConsole(QString(msg), QString("Red"));
 	return;
+}
+short RUIThread::processZigBeeCommand(char command, char *payload, short &payloadLength, char **message, short &msgLength)
+{
+	short status;
+	short payloadIndex;
+	char msg[80];
+	char modemStatus;
+	char deliveryStatus;
+	short clusterID;
+	float currentTempOfATag;
+	switch(command)
+	{
+		case MODEM_STATUS_FRAME:
+				qDebug("received modem status\n");
+				modemStatus = GET_ZIGBEE_DATA_FRAME_STATUS(payload);
+				qDebug("modem status = 0x%x\n", modemStatus);
+				if(modemStatus == ZIGBEE_HAVE_JOINED_NETWORK)
+				{
+					qDebug("joined network, modemStatus = %i\n", modemStatus);
+					sprintf(msg, "Joined ZigBee network, obtaining network addresses...\n");
+					emit outputToConsole(QString(msg), QString("Red"));
+					QThread::msleep(1200);
+					string response = interface.sendATCommand("+++", 3);
+					QThread::msleep(1200);
+					response = interface.sendATCommand("ATMY\r", 4);
+					qDebug("response = %s\n", response.c_str());
+					if(response != "TIMEOUT ERROR")
+					{
+						this->my16BitNetworkAddr = strtol(response.c_str(), NULL, 16);
+						qDebug("my 16-bit network addr = 0x%4x\n", my16BitNetworkAddr);
+					
+						response = interface.sendATCommand("ATSH\r", 6);
+						qDebug("response = %s\n", response.c_str());
+						if(response != "TIMEOUT ERROR")
+						{
+							this->my64BitNetworkAddrHigh = strtol(response.c_str(), NULL, 16);
+							qDebug("my 64-bit network addr high = 0x%x\n", my64BitNetworkAddrHigh);
+						
+							response = interface.sendATCommand("ATSL\r", 8);
+							qDebug("response = %s\n", response.c_str());
+							if(response != "TIMEOUT ERROR")
+							{
+								this->my64BitNetworkAddrLow = strtol(response.c_str(), NULL, 16);
+								qDebug("my 64-bit network addr low = 0x%x\n", my64BitNetworkAddrLow);
+								
+								response = interface.sendATCommand("ATCN\r", 2);
+								qDebug("response = %s\n", response.c_str());
+							}
+						}
+					}
+					if(response == "OK")
+					{
+						*message = new char[ZIGBEE_FRAME_HEADER_SIZE + ANNOUNCE_DEVICE_FRAME_SIZE + ZIGBEE_CHECKSUM_SIZE];
+						payloadIndex = 4;
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x01); //frame ID
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0xFF); //16 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0xFC); //16 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //source endpoint
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //dest endpoint
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //cluster ID
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x13); //cluster ID
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //profile ID
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //profile ID
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //broadcast radius
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //transmit options
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0xAB); //a frame ID - unimportant field
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, this->my16BitNetworkAddr & 0xFF); //our 16-bit network address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, this->my16BitNetworkAddr >>8 & 0xFF); //our 16-bit network address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, this->my64BitNetworkAddrLow & 0xFF); //our 64-bit address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, this->my64BitNetworkAddrLow >> 8 & 0xFF); //our 64-bit address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, this->my64BitNetworkAddrLow >> 16 & 0xFF); //our 64-bit address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, this->my64BitNetworkAddrLow >> 24 & 0xFF); //our 64-bit address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, this->my64BitNetworkAddrHigh & 0xFF); //our 64-bit address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, this->my64BitNetworkAddrHigh >> 8 & 0xFF); //our 64-bit address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, this->my64BitNetworkAddrHigh >> 16 & 0xFF); //our 64-bit address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, this->my64BitNetworkAddrHigh >> 24 & 0xFF); //our 64-bit address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x04); //capability: Home Automation
+						msgLength = ANNOUNCE_DEVICE_FRAME_SIZE;
+						qDebug("Announcing device to Hub...\n");
+						sprintf(msg, "Announcing device to Hub...\n");
+						emit outputToConsole(QString(msg), QString("Red"));
+					}
+					else
+					{
+						*message = NULL;
+						msgLength = 0;
+						qDebug("failed to obtain network addresses\n");
+						sprintf(msg, "failed to obtain network addresses\n");
+						emit outputToConsole(QString(msg), QString("Red"));	
+					}
+				}
+				else
+				{
+					*message = NULL;
+					msgLength = 0;
+					qDebug("have not joined a ZigBee network\n");
+					sprintf(msg, "Have not joined a ZigBee network\n");
+					emit outputToConsole(QString(msg), QString("Red"));	
+				}
+			break;
+		case TRANSMIT_STATUS_FRAME:
+				qDebug("received transmit status\n");
+				deliveryStatus = GET_ZIGBEE_DATA_FRAME_DELIVERY_STATUS(payload);
+				if(deliveryStatus == ZIGBEE_TRANSMISSION_SUCCESSFUL)
+				{
+					qDebug("transmission ok\n");
+					short frameTransmittedID = GET_ZIGBEE_DATA_FRAME_DELIVERY_ID(payload);
+					if(frameTransmittedID == 0x03)
+					{
+						qDebug("connected to Hub!\n");
+						sprintf(msg, "Connected to Hub!\n");
+						emit outputToConsole(QString(msg), QString("Red"));
+					}
+				}
+				*message = NULL;
+				msgLength = 0;
+			break;
+		case EXPLICIT_RX_INDICATOR_FRAME:
+			qDebug("received explicit rx indicator frame\n");
+			clusterID = GET_ZIGBEE_DATA_FRAME_CLUSTER_ID(payload);
+			switch (clusterID)
+			{
+				case ACTIVE_ENDPOINTS_REQUEST_FRAME:
+						qDebug("received active endpoints request frame\n");
+						*message = new char[ZIGBEE_FRAME_HEADER_SIZE + REPORT_ENDPOINT_FRAME_SIZE + ZIGBEE_CHECKSUM_SIZE];
+						payloadIndex = 4;
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x02); //frame ID
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //16 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //16 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //source endpoint
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //dest endpoint
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x80); //cluster ID
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x05); //cluster ID
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //profile ID
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //profile ID
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //broadcast radius
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //transmit options
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, GET_ZIGBEE_DATA_FRAME_ENDPOINT_REQUEST_ID(payload));
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //status 00=OK
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, this->my16BitNetworkAddr & 0xFF); //our 16-bit network address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, this->my16BitNetworkAddr >> 8 & 0xFF); //our 16-bit network address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x01); //number of endpoints
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x08); //endpoint address
+						msgLength = REPORT_ENDPOINT_FRAME_SIZE;
+						qDebug("Reporting Endpoints...\n");
+						sprintf(msg, "Reporting Endpoints...\n");
+						emit outputToConsole(QString(msg), QString("Red"));
+					break;
+				case SIMPLE_DESCRIPTOR_REQUEST_FRAME:
+						qDebug("received simple descriptor request frame\n");
+						*message = new char[ZIGBEE_FRAME_HEADER_SIZE + SIMPLE_DESCRIPTOR_REQUEST_FRAME_SIZE + ZIGBEE_CHECKSUM_SIZE];
+						payloadIndex = 4;
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x03); //frame ID
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //16 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //16 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //source endpoint
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //dest endpoint
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x80); //cluster ID
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x04); //cluster ID
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //profile ID
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //profile ID
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //broadcast radius
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //transmit options
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, GET_ZIGBEE_DATA_FRAME_SIMPLE_DESCRIPTOR_REQUEST_ID(payload));
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //status 00=OK
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, this->my16BitNetworkAddr & 0xFF); //our 16-bit network address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, this->my16BitNetworkAddr >> 8 & 0xFF); //our 16-bit network address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x0E); //number of bytes sent after this one
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x08); //endpoint address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x04); //home automation endpoint
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x01); //home automation endpoint
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x02); //on/off output
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //on/off output
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x30); //version numbers
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x03); //number of clusters we can accept in
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //first cluster type
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //first cluster type
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x03); //second cluster type
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //second cluster type
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x06); //third cluster type
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //third cluster type
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //number of clusters we send out
+						msgLength = SIMPLE_DESCRIPTOR_REQUEST_FRAME_SIZE;
+						qDebug("Sending Simple Descriptor...\n");
+						sprintf(msg, "Sending Simple Descriptor...\n");
+						emit outputToConsole(QString(msg), QString("Red"));						
+					break;
+				case TEMPERATURE_MEASUREMENT_REQUEST_FRAME:
+						qDebug("received temperature measurement request frame\n");
+						sprintf(msg, "Received temperature measurement request, reading tag...\n");
+						emit outputToConsole(QString(msg), QString("Red"));
+						*message = new char[ZIGBEE_FRAME_HEADER_SIZE + TEMP_MEASUREMENT_REQUEST_FRAME_SIZE + ZIGBEE_CHECKSUM_SIZE];
+						payloadIndex = 4;
+						currentTempOfATag = getTempOfATag();
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x04); //frame ID
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //64 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //16 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //16 bit dest address
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //source endpoint
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //dest endpoint
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x84); //cluster ID
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x02); //cluster ID
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0xC1); //profile ID
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x04); //profile ID
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //broadcast radius
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0x00); //transmit options
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, GET_ZIGBEE_TEMP_MEASUREMENT_REQUEST_CONTROL_FRAME(payload));
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, GET_ZIGBEE_TEMP_MEASUREMENT_REQUEST_FRAME_ID(payload));
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0); //measured value identifier
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, 0); //measured value identifier
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, (int)(currentTempOfATag * 10) & 0xFF); //temperature measured, low byte
+						SET_ZIGBEE_FRAME_PAYLOAD((*message), payloadIndex++, ((int)(currentTempOfATag * 10) >> 8) & 0xFF); //temperature measured, high byte
+						msgLength = TEMP_MEASUREMENT_REQUEST_FRAME_SIZE;
+						if(currentTempOfATag == 0xE3)
+						{
+							qDebug("did not find a tag!\n");
+							sprintf(msg, "Did not find a tag!\n");
+							emit outputToConsole(QString(msg), QString("Red"));
+						}
+						else if(currentTempOfATag == 0xE2)
+						{
+							qDebug("could not measure temperature of tag\n");
+							sprintf(msg, "Could not measure temperature of tag!\n");
+							emit outputToConsole(QString(msg), QString("Red"));
+						}
+						else
+						{
+							qDebug("Sending Temperature Measurement of %3.2f degrees C...\n", currentTempOfATag);
+							sprintf(msg, "Sending temperature measurement of %3.2f degrees C...\n", currentTempOfATag);
+							emit outputToConsole(QString(msg), QString("Red"));
+						}
+					break;
+				default:
+						*message = NULL;
+						msgLength = 0;
+						qDebug("received cluster = 0x%x. Not handled.\n", clusterID);
+					break;
+			}
+			break;
+		default:
+				*message = NULL;
+				msgLength = 0;
+				qDebug("received command = 0x%x. Not handled.\n", command);
+			break;
+	}
+	return status;
 }
 short RUIThread::processCommand(char command, char *payload, short &payloadLength, char **message, short &msgLength)
 {
@@ -170,7 +499,7 @@ short RUIThread::processCommand(char command, char *payload, short &payloadLengt
 		case SEARCH_FOR_TEMP_TAGS:
 			qDebug("Received SEARCH FOR TEMP TAGS\n");
 			sprintf(msg, "Received SEARCH FOR TEMP TAGS CMD, processing...\n");
-			emit outputToConsole(QString(msg), QString("Red"));
+			emit outputToConsole(QString(msg), QString("Blue"));
 			status = 0;
 			if(payloadLength > 0 && payload != NULL)
 			{
@@ -178,7 +507,7 @@ short RUIThread::processCommand(char command, char *payload, short &payloadLengt
 				delete[] payload;
 				payload = NULL;
 			}
-			controller->searchForTempTags();
+			controller->searchForTempTags(MAX_SEARCH_TIME);
 			numberOfTagsFound = model->TempTagList.size();
 			size = MSG_HEADER_SIZE + numberOfTagsFound * (EPCMAXLENGTH*2 + TIDMAXLENGTH*2 + EPCLEN_LENGTH + TIDLEN_LENGTH +
 					TEMPCALC1_LENGTH + TEMPCALT1_LENGTH + TEMPCALC2_LENGTH + TEMPCALT2_LENGTH 
@@ -187,6 +516,8 @@ short RUIThread::processCommand(char command, char *payload, short &payloadLengt
 			if(!((*message)))
 			{
 				qDebug("failed to allocate memory\n");
+				*message = NULL;
+				msgLength = 0;
 				status = -1;
 				break;
 			}
@@ -281,7 +612,7 @@ short RUIThread::processCommand(char command, char *payload, short &payloadLengt
 		case SEARCH_FOR_MOISTURE_TAGS:
 			qDebug("Received SEARCH FOR MOISTURE TAGS\n");
 			sprintf(msg, "Received SEARCH FOR MOISTURE TAGS CMD, processing...\n");
-			emit outputToConsole(QString(msg), QString("Red"));
+			emit outputToConsole(QString(msg), QString("Blue"));
 			status = 0;
 			if(payloadLength > 0 && payload != NULL)
 			{
@@ -289,7 +620,7 @@ short RUIThread::processCommand(char command, char *payload, short &payloadLengt
 				delete[] payload;
 				payload = NULL;
 			}
-			controller->searchForMoistureTags();
+			controller->searchForMoistureTags(MAX_SEARCH_TIME);
 			numberOfTagsFound = model->MoistTagList.size();
 			size = MSG_HEADER_SIZE + numberOfTagsFound * (EPCMAXLENGTH*2 + TIDMAXLENGTH*2 + EPCLEN_LENGTH + TIDLEN_LENGTH +
 					TEMPCALC1_LENGTH + TEMPCALT1_LENGTH + TEMPCALC2_LENGTH + TEMPCALT2_LENGTH 
@@ -298,6 +629,8 @@ short RUIThread::processCommand(char command, char *payload, short &payloadLengt
 			if(!((*message)))
 			{
 				qDebug("failed to allocate memory\n");
+				*message = NULL;
+				msgLength = 0;
 				status = -1;
 				break;
 			}
@@ -392,7 +725,7 @@ short RUIThread::processCommand(char command, char *payload, short &payloadLengt
 		case MEASURE_TEMP_TAGS:
 			qDebug("Received MEASURE TEMP TAGS\n");
 			sprintf(msg, "Received MEASURE TEMP TAGS CMD, processing...\n");
-			emit outputToConsole(QString(msg), QString("Red"));
+			emit outputToConsole(QString(msg), QString("Blue"));
 			status = 0;
 			if(payloadLength > 0 && payload != NULL)
 			{
@@ -412,6 +745,8 @@ short RUIThread::processCommand(char command, char *payload, short &payloadLengt
 			if(!((*message)))
 			{
 				qDebug("failed to allocate memory\n");
+				*message = NULL;
+				msgLength = 0;
 				status = -1;
 				break;
 			}
@@ -472,7 +807,7 @@ short RUIThread::processCommand(char command, char *payload, short &payloadLengt
 		case MEASURE_MOISTURE_TAGS:
 			qDebug("Received MEASURE MOISTURE TAGS\n");
 			sprintf(msg, "Received MEASURE MOISTURE TAGS CMD, processing...\n");
-			emit outputToConsole(QString(msg), QString("Red"));
+			emit outputToConsole(QString(msg), QString("Blue"));
 			status = 0;
 			if(payloadLength > 0 && payload != NULL)
 			{
@@ -492,6 +827,8 @@ short RUIThread::processCommand(char command, char *payload, short &payloadLengt
 			if(!((*message)))
 			{
 				qDebug("failed to allocate memory\n");
+				*message = NULL;
+				msgLength = 0;
 				status = -1;
 				break;
 			}
@@ -552,7 +889,7 @@ short RUIThread::processCommand(char command, char *payload, short &payloadLengt
 		case GET_TEMP_DEMO_SETTINGS:
 			qDebug("Received GET TEMP DEMO SETTINGS\n");
 			sprintf(msg, "Received GET TEMP DEMO SETTINGS CMD, processing...\n");
-			emit outputToConsole(QString(msg), QString("Red")); 
+			emit outputToConsole(QString(msg), QString("Blue")); 
 			status = 0;
 			if(payloadLength > 0 && payload != NULL)
 			{
@@ -577,8 +914,8 @@ short RUIThread::processCommand(char command, char *payload, short &payloadLengt
 			SET_MESSAGE_PAYLOAD((*message), payloadIndex++, model->tempAutoPower);
 			sprintf(msg, "Temp Auto Power: %i\n", model->tempAutoPower);
 			emit outputToConsole(QString(msg), QString("Red"));
-			SET_MESSAGE_PAYLOAD((*message), payloadIndex++, model->tempMaxPower);
-			sprintf(msg, "Temp Max Power: %i\n", model->tempMaxPower);
+			SET_MESSAGE_PAYLOAD((*message), payloadIndex++, model->getTempMaxPowerLevel());
+			sprintf(msg, "Temp Max Power: %i\n", model->getTempMaxPowerLevel());
 			emit outputToConsole(QString(msg), QString("Red"));
 			SET_MESSAGE_PAYLOAD((*message), payloadIndex++, model->TempTargetOnChipRssiMin & 0xFF);
 			SET_MESSAGE_PAYLOAD((*message), payloadIndex++, model->TempTargetOnChipRssiMin >> 8 & 0xFF);
@@ -606,7 +943,7 @@ short RUIThread::processCommand(char command, char *payload, short &payloadLengt
 		case SET_TEMP_DEMO_SETTINGS:
 			qDebug("Received SET TEMP DEMO SETTINGS\n");
 			sprintf(msg, "Received SET TEMP DEMO SETTINGS CMD, processing...\n");
-			emit outputToConsole(QString(msg), QString("Red"));
+			emit outputToConsole(QString(msg), QString("Blue"));
 			status = 0;
 			size = MSG_HEADER_SIZE + sizeof(model->currentFreqBand) +
 				sizeof(model->tempAutoPower) +
@@ -623,7 +960,15 @@ short RUIThread::processCommand(char command, char *payload, short &payloadLengt
 				currentFreqBand += GET_MESSAGE_PAYLOAD(payload, payloadIndex++) << 16;
 				currentFreqBand += GET_MESSAGE_PAYLOAD(payload, payloadIndex++) << 24;
 				if(currentFreqBand >= 0 && currentFreqBand <= 5)
-					controller->setBandRegion((FreqBandEnum)currentFreqBand);
+				{
+					status = controller->setBandRegion((FreqBandEnum)currentFreqBand);
+					if(status != 0)
+					{
+						controller->turnReaderOff();
+						QThread::msleep(100);
+						controller->turnReaderOn();
+					}
+				}
 				else
 					status = -1;
 				sprintf(msg, "Current freq band: %i\n", model->currentFreqBand);
@@ -697,7 +1042,7 @@ short RUIThread::processCommand(char command, char *payload, short &payloadLengt
 		case GET_MOISTURE_DEMO_SETTINGS:
 			qDebug("Received GET MOISTURE DEMO SETTINGS\n");
 			sprintf(msg, "Received GET MOISTURE DEMO SETTINGS CMD, processing...\n");
-			emit outputToConsole(QString(msg), QString("Red")); 
+			emit outputToConsole(QString(msg), QString("Blue")); 
 			status = 0;
 			if(payloadLength > 0 && payload != NULL)
 			{
@@ -722,8 +1067,8 @@ short RUIThread::processCommand(char command, char *payload, short &payloadLengt
 			SET_MESSAGE_PAYLOAD((*message), payloadIndex++, model->moistAutoPower);
 			sprintf(msg, "Moist Auto Power: %i\n", model->moistAutoPower);
 			emit outputToConsole(QString(msg), QString("Red"));
-			SET_MESSAGE_PAYLOAD((*message), payloadIndex++, model->moistMaxPower);
-			sprintf(msg, "Moist Max Power: %i\n", model->moistMaxPower);
+			SET_MESSAGE_PAYLOAD((*message), payloadIndex++, model->getMoistMaxPowerLevel());
+			sprintf(msg, "Moist Max Power: %i\n", model->getMoistMaxPowerLevel());
 			emit outputToConsole(QString(msg), QString("Red"));
 			SET_MESSAGE_PAYLOAD((*message), payloadIndex++, model->MoistTargetOnChipRssiMin & 0xFF);
 			SET_MESSAGE_PAYLOAD((*message), payloadIndex++, model->MoistTargetOnChipRssiMin >> 8 & 0xFF);
@@ -751,7 +1096,7 @@ short RUIThread::processCommand(char command, char *payload, short &payloadLengt
 		case SET_MOISTURE_DEMO_SETTINGS:
 			qDebug("Received SET MOISTURE DEMO SETTINGS\n");
 			sprintf(msg, "Received SET MOISTURE DEMO SETTINGS CMD, processing...\n");
-			emit outputToConsole(QString(msg), QString("Red"));
+			emit outputToConsole(QString(msg), QString("Blue"));
 			status = 0;
 			size = MSG_HEADER_SIZE + sizeof(model->currentFreqBand) +
 				sizeof(model->moistAutoPower) +
@@ -768,7 +1113,15 @@ short RUIThread::processCommand(char command, char *payload, short &payloadLengt
 				currentFreqBand += GET_MESSAGE_PAYLOAD(payload, payloadIndex++) << 16;
 				currentFreqBand += GET_MESSAGE_PAYLOAD(payload, payloadIndex++) << 24;
 				if(currentFreqBand >= 0 && currentFreqBand <= 5)
-					controller->setBandRegion((FreqBandEnum)currentFreqBand);
+				{
+					status = controller->setBandRegion((FreqBandEnum)currentFreqBand);
+					if(status != 0)
+					{
+						controller->turnReaderOff();
+						QThread::msleep(100);
+						controller->turnReaderOn();
+					}
+				}
 				else
 					status = -1;
 				sprintf(msg, "Current freq band: %i\n", model->currentFreqBand);
@@ -841,6 +1194,8 @@ short RUIThread::processCommand(char command, char *payload, short &payloadLengt
 			break;
 		default:
 			status = -1;
+			*message = NULL;
+			msgLength = 0;
 			break;
 	}
 	return status;
@@ -860,7 +1215,7 @@ short RUIThread::processCANCommand(char command, char *payload, short &payloadLe
 		case SEARCH_FOR_TEMP_TAGS:
 			qDebug("Received SEARCH FOR TEMP TAGS\n");
 			sprintf(msg, "Received SEARCH FOR TEMP TAGS CMD, processing...\n");
-			emit outputToConsole(QString(msg), QString("Red"));
+			emit outputToConsole(QString(msg), QString("Blue"));
 			status = 0;
 			if(payloadLength > 0 && payload != NULL)
 			{
@@ -868,7 +1223,7 @@ short RUIThread::processCANCommand(char command, char *payload, short &payloadLe
 				delete[] payload;
 				payload = NULL;
 			}
-			controller->searchForTempTags();
+			controller->searchForTempTags(MAX_SEARCH_TIME);
 			numberOfTagsFound = model->TempTagList.size();
 			size = numberOfTagsFound * (1 * 8 +  	//EPC length packet
 					11 * 8 + 	//EPC packets max
@@ -881,6 +1236,8 @@ short RUIThread::processCANCommand(char command, char *payload, short &payloadLe
 			if(!((*message)))
 			{
 				qDebug("failed to allocate memory\n");
+				*message = NULL;
+				msgLength = 0;
 				status = -1;
 				break;
 			}
@@ -1050,7 +1407,7 @@ short RUIThread::processCANCommand(char command, char *payload, short &payloadLe
 		case SEARCH_FOR_MOISTURE_TAGS:
 			qDebug("Received SEARCH FOR MOISTURE TAGS\n");
 			sprintf(msg, "Received SEARCH FOR MOISTURE TAGS CMD, processing...\n");
-			emit outputToConsole(QString(msg), QString("Red"));
+			emit outputToConsole(QString(msg), QString("Blue"));
 			status = 0;
 			if(payloadLength > 0 && payload != NULL)
 			{
@@ -1058,7 +1415,7 @@ short RUIThread::processCANCommand(char command, char *payload, short &payloadLe
 				delete[] payload;
 				payload = NULL;
 			}
-			controller->searchForMoistureTags();
+			controller->searchForMoistureTags(MAX_SEARCH_TIME);
 			numberOfTagsFound = model->MoistTagList.size();
 			size = numberOfTagsFound * (1 * 8 +  	//EPC length packet
 					11 * 8 + 	//EPC packets max
@@ -1071,6 +1428,8 @@ short RUIThread::processCANCommand(char command, char *payload, short &payloadLe
 			if(!((*message)))
 			{
 				qDebug("failed to allocate memory\n");
+				*message = NULL;
+				msgLength = 0;
 				status = -1;
 				break;
 			}
@@ -1240,7 +1599,7 @@ short RUIThread::processCANCommand(char command, char *payload, short &payloadLe
 		case MEASURE_TEMP_TAGS:
 			qDebug("Received MEASURE TEMP TAGS\n");
 			sprintf(msg, "Received MEASURE TEMP TAGS CMD, processing...\n");
-			emit outputToConsole(QString(msg), QString("Red"));
+			emit outputToConsole(QString(msg), QString("Blue"));
 			status = 0;
 			if(payloadLength > 0 && payload != NULL)
 			{
@@ -1256,6 +1615,8 @@ short RUIThread::processCANCommand(char command, char *payload, short &payloadLe
 			if(!((*message)))
 			{
 				qDebug("failed to allocate memory\n");
+				*message = NULL;
+				msgLength = 0;
 				status = -1;
 				break;
 			}
@@ -1321,7 +1682,7 @@ short RUIThread::processCANCommand(char command, char *payload, short &payloadLe
 		case MEASURE_MOISTURE_TAGS:
 			qDebug("Received MEASURE MOISTURE TAGS\n");
 			sprintf(msg, "Received MEASURE MOISTURE TAGS CMD, processing...\n");
-			emit outputToConsole(QString(msg), QString("Red"));
+			emit outputToConsole(QString(msg), QString("Blue"));
 			status = 0;
 			if(payloadLength > 0 && payload != NULL)
 			{
@@ -1337,6 +1698,8 @@ short RUIThread::processCANCommand(char command, char *payload, short &payloadLe
 			if(!((*message)))
 			{
 				qDebug("failed to allocate memory\n");
+				*message = NULL;
+				msgLength = 0;
 				status = -1;
 				break;
 			}
@@ -1401,7 +1764,33 @@ short RUIThread::processCANCommand(char command, char *payload, short &payloadLe
 			break;
 		default:
 			status = -1;
+			*message = NULL;
+			msgLength = 0;
 			break;
 	}
 	return status;
+}
+float RUIThread::getTempOfATag()
+{
+	controller->searchForTempTags(MAX_SEARCH_TIME);
+	short numberOfTagsFound = model->TempTagList.size();
+	if(numberOfTagsFound > 0)
+	{
+		qDebug("found tags, measuring temperature of one...\n");
+		controller->measureTempTags();
+		short tagsTempMeasHistorySize = model->TempTagList[0].TemperatureMeasurementHistory.size();
+		float tempValue;
+		if(tagsTempMeasHistorySize > 0)
+		{
+			qDebug("measured temp!\n");
+			tempValue = model->TempTagList[0].TemperatureMeasurementHistory[tagsTempMeasHistorySize - 1].getValue();
+		}
+		else
+		{
+			qDebug("could not measure temp!\n");
+			tempValue = 0xE2;
+		}
+		return tempValue;
+	}
+	return 0xE3;
 }

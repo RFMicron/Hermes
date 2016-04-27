@@ -33,7 +33,7 @@ Hermes::Hermes(KitModel *model, KitController *controller, QWidget *parent)
 	layout << QWizard::Stretch << QWizard::CancelButton;
 	setButtonLayout(layout);
 	setFixedSize(800, 430);
-	setWindowTitle(tr("Hermes IoT Development Platform v1.0.0"));
+	setWindowTitle(tr("Hermes IoT Development Platform v1.1.0"));
 }
 void Hermes::quitButtonClicked()
 {
@@ -214,10 +214,6 @@ TempDemoPage::TempDemoPage(KitModel *model, KitController *controller, QWidget *
 	mainLayout->addLayout(demoControlLayout);
 	setLayout(mainLayout);
 	stopButton->setEnabled(false);
-}
-bool TempDemoPage::abortRequested()
-{
-	return thread->abortRequested();
 }
 void TempDemoPage::updateTagSelectionsSlot()
 {
@@ -464,10 +460,6 @@ MoistureDemoPage::MoistureDemoPage(KitModel *model, KitController *controller, Q
 	setLayout(mainLayout);
 	stopButton->setEnabled(false);
 }
-bool MoistureDemoPage::abortRequested()
-{
-	return thread->abortRequested();
-}
 void MoistureDemoPage::updateTagSelectionsSlot()
 {
 	qDebug("updateTagSelectionsSlot");
@@ -609,6 +601,7 @@ RemoteOperationPage::RemoteOperationPage(KitModel *model, KitController *control
 	interfaceTypeCombo->addItem(tr("CAN"));
 	interfaceTypeCombo->addItem(tr("I2C"));
 	interfaceTypeCombo->addItem(tr("SPI"));
+	interfaceTypeCombo->addItem(tr("ZIGBEE"));
 	connect(startButton, SIGNAL(clicked()),
 			this, SLOT(startButtonClicked()));
 	connect(stopButton, SIGNAL(clicked()),
@@ -645,10 +638,17 @@ void RemoteOperationPage::startButtonClicked()
 {
 	console->clear();
 	QString interfaceType = interfaceTypeCombo->currentText();
-	controller->launchRUI(interfaceType);
+	outputToConsole("Initializing interface, please wait...\n", "Red");
 	startButton->setEnabled(false);
 	stopButton->setEnabled(true);
 	mainButton->setEnabled(false);
+	if(controller->launchRUI(interfaceType) != 0)
+	{
+		outputToConsole("Could not start RUI!\n", "Red");
+		startButton->setEnabled(true);
+		stopButton->setEnabled(false);
+		mainButton->setEnabled(true);
+	}
 }
 void RemoteOperationPage::stopButtonClicked()
 {

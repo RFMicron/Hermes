@@ -23,6 +23,7 @@
 #include "can.h"
 #include "i2c_bridge.h"
 #include "spi_bridge.h"
+#include "zigbee.h"
 
 #define SEARCH_FOR_TEMP_TAGS 			1
 #define SEARCH_FOR_TEMP_TAGS_RESP		2
@@ -50,6 +51,7 @@ class Interfaces
 		CAN *can;
 		I2C_Bridge *i2c_bridge;
 		SPI_Bridge *spi_bridge;
+		ZigBee *zigbee;
 	public:
 		Interfaces();
 		short setType(Interface::InterfaceType interface);
@@ -65,8 +67,13 @@ class Interfaces
 		short receiveCmdThruCAN(char *cmdMsg, short &cmdMsgLength);
 		short receiveCmdThruI2C(char *cmdMsg, short &cmdMsgLength);
 		short receiveCmdThruSPI(char *cmdMsg, short &cmdMsgLength);
+		short receiveCmdThruZIGBEE(char *cmdMsg, short &cmdMsgLength);
 		short checkCRC(char *cmdMsg, short &cmdMsgLength);
+		short checkCheckSum(char *cmdMsg, short &cmdMsgLength);
 		short sendResponse(char command, short status, char *message, short msgLength);
 		unsigned short calculateCRC(const void *buf, unsigned short len);
+		unsigned short calculateCheckSum(const void *buf, unsigned short len);
+		string sendATCommand(string command, short numberOfBytesToReceive);
+		short configureZigBee();
 };
 #endif

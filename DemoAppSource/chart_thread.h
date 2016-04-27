@@ -51,7 +51,5 @@ class ChartThread : public QThread
 		void initialize(KitController *controller, KitModel *model);
 		short startCollection(CollectionType type, int period);
 		void stopCollection(CollectionType type);
-		bool abortRequested();
-		short processCommand(char command, char *payload, short &payloadLength);
 };
 #endif 

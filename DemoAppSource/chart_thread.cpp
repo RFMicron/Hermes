@@ -26,6 +26,7 @@ short ChartThread::startCollection(CollectionType type, int period)
 	if(!isRunning())
 	{
 		abort = false;
+		model->setAbort(false);
 		collectionType = type;
 		measurementPeriod = period;
 		start(LowPriority);
@@ -40,15 +41,12 @@ void ChartThread::stopCollection(CollectionType type)
 	{
 		mutex.lock();
 		abort = true;
+		model->setAbort(true);
 		mutex.unlock();
 		wait();
 	}
 	else
 		qDebug("collection type not running\n");
-}
-bool ChartThread::abortRequested()
-{
-	return abort;
 }
 void ChartThread::run()
 {

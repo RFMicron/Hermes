@@ -95,7 +95,6 @@ class AMSRadonReader
 				char &status,
 				char &dataLength,
 				char *receivedData);
-		short shutdown();
 };
 class TagData 
 {

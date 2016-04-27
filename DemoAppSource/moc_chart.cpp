@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'chart.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.3.2)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.5.1)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -13,7 +13,7 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'chart.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.3.2. It"
+#error "This file was generated using the moc from 5.5.1. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -21,29 +21,30 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Chart_t {
     QByteArrayData data[14];
-    char stringdata[198];
+    char stringdata0[198];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    qptrdiff(offsetof(qt_meta_stringdata_Chart_t, stringdata) + ofs \
+    qptrdiff(offsetof(qt_meta_stringdata_Chart_t, stringdata0) + ofs \
         - idx * sizeof(QByteArrayData)) \
     )
 static const qt_meta_stringdata_Chart_t qt_meta_stringdata_Chart = {
     {
-QT_MOC_LITERAL(0, 0, 5),
-QT_MOC_LITERAL(1, 6, 17),
-QT_MOC_LITERAL(2, 24, 0),
-QT_MOC_LITERAL(3, 25, 16),
-QT_MOC_LITERAL(4, 42, 11),
-QT_MOC_LITERAL(5, 54, 18),
-QT_MOC_LITERAL(6, 73, 12),
-QT_MOC_LITERAL(7, 86, 20),
-QT_MOC_LITERAL(8, 107, 16),
-QT_MOC_LITERAL(9, 124, 16),
-QT_MOC_LITERAL(10, 141, 21),
-QT_MOC_LITERAL(11, 163, 17),
-QT_MOC_LITERAL(12, 181, 13),
-QT_MOC_LITERAL(13, 195, 2)
+QT_MOC_LITERAL(0, 0, 5), // "Chart"
+QT_MOC_LITERAL(1, 6, 17), // "setTempCurvesSlot"
+QT_MOC_LITERAL(2, 24, 0), // ""
+QT_MOC_LITERAL(3, 25, 16), // "QList<SensorTag>"
+QT_MOC_LITERAL(4, 42, 11), // "TempTagList"
+QT_MOC_LITERAL(5, 54, 18), // "setMoistCurvesSlot"
+QT_MOC_LITERAL(6, 73, 12), // "MoistTagList"
+QT_MOC_LITERAL(7, 86, 20), // "updateTempCurvesSlot"
+QT_MOC_LITERAL(8, 107, 16), // "QList<QDateTime>"
+QT_MOC_LITERAL(9, 124, 16), // "TempMeasTimeList"
+QT_MOC_LITERAL(10, 141, 21), // "updateMoistCurvesSlot"
+QT_MOC_LITERAL(11, 163, 17), // "MoistMeasTimeList"
+QT_MOC_LITERAL(12, 181, 13), // "legendChecked"
+QT_MOC_LITERAL(13, 195, 2) // "on"
+
     },
     "Chart\0setTempCurvesSlot\0\0QList<SensorTag>\0"
     "TempTagList\0setMoistCurvesSlot\0"
@@ -88,6 +89,7 @@ void Chart::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
         Chart *_t = static_cast<Chart *>(_o);
+        Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->setTempCurvesSlot((*reinterpret_cast< QList<SensorTag>(*)>(_a[1]))); break;
         case 1: _t->setMoistCurvesSlot((*reinterpret_cast< QList<SensorTag>(*)>(_a[1]))); break;
@@ -137,7 +139,7 @@ void Chart::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
 
 const QMetaObject Chart::staticMetaObject = {
     { &QwtPlot::staticMetaObject, qt_meta_stringdata_Chart.data,
-      qt_meta_data_Chart,  qt_static_metacall, 0, 0}
+      qt_meta_data_Chart,  qt_static_metacall, Q_NULLPTR, Q_NULLPTR}
 };
 
 
@@ -148,8 +150,8 @@ const QMetaObject *Chart::metaObject() const
 
 void *Chart::qt_metacast(const char *_clname)
 {
-    if (!_clname) return 0;
-    if (!strcmp(_clname, qt_meta_stringdata_Chart.stringdata))
+    if (!_clname) return Q_NULLPTR;
+    if (!strcmp(_clname, qt_meta_stringdata_Chart.stringdata0))
         return static_cast<void*>(const_cast< Chart*>(this));
     return QwtPlot::qt_metacast(_clname);
 }

@@ -21,6 +21,7 @@
 #include "kit_controller.h"
 #include "kit_model.h"
 #include "interfaces.h"
+#include "GPIO.h"
 #include "interface_enums.h"
 #include <QString>
 #include <QMutex>
@@ -29,6 +30,8 @@
 
 class KitController;
 class KitModel;
+
+using namespace exploringBB;
 
 class RUIThread : public QThread
 {
@@ -41,18 +44,24 @@ class RUIThread : public QThread
 		QWaitCondition condition;
 		bool abort;
 		Interface::Mode mode;
+		short my16BitNetworkAddr;
+		int my64BitNetworkAddrHigh;
+		int my64BitNetworkAddrLow;
+		GPIO *xBeeResetLine;
 	protected:
 		void run() Q_DECL_OVERRIDE;
 	signals:
 		void outputToConsole(QString text, QString color);
 	public:
 		RUIThread(QObject *parent = 0);
-		void initialize(KitController *controller, KitModel *model);
+		void initialize(KitController *controller, KitModel *model, GPIO *xBeeResetLine);
 		short startInterface();
 		void stopInterface();
 		short processCommand(char command, char *payload, short &payloadLength, char **message, short &msgLength);
+		short processZigBeeCommand(char command, char *payload, short &payloadLength, char **message, short &msgLength);
 		short processCANCommand(char command, char *payload, short &payloadLength, char **message, short &msgLength);
 		short setType(Interface::InterfaceType interface);
 		short setMode(Interface::Mode mode);
+		float getTempOfATag();
 }; 
 #endif 

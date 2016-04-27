@@ -1,5 +1,6 @@
 #include <vector>
 #include <iostream>
+#include <QTime>
 #include "kit_model.h"
 #include "gui_view.h"
 #include "utilityFunctions.h"
@@ -49,7 +50,8 @@ void KitModel::initialize()
 	moistMaxPower = 6;
 	tempMinSamplesPerMeas = 5;
 	moistMinSamplesPerMeas = 5;
-	gpio7->setDirection(GPIO::OUTPUT);	
+	gpio7->setDirection(GPIO::OUTPUT);
+	abort = false;	
 	qDebug("kit_model initialized");
 }
 void KitModel::registerTemperatureObserver(GUIView *gui)
@@ -59,6 +61,10 @@ void KitModel::registerTemperatureObserver(GUIView *gui)
 void KitModel::registerMoistureObserver(GUIView *gui)
 {
 	moistureObserver = gui;
+}
+void KitModel::setAbort(bool status)
+{
+	this->abort = status;
 }
 void KitModel::selectForMeasurement(QString measurementType, QString tagLabel, bool select)
 {
@@ -698,8 +704,7 @@ bool KitModel::findOptimumPower(int tagIndex, QString measurementType)
 		for (int i=1; i<=6; i++)  // Maximum of 6 iterations to look for power
 		{
 			qDebug("Iteration %d", i);
-			bool abort = tempObserver->wizard->tempDemoPage->abortRequested();
-			if (abort)
+			if (this->abort)
 				return false;
 			setPower(nextPowerCode);
 			qDebug("Power set to %d", txPower);
@@ -810,8 +815,7 @@ bool KitModel::findOptimumPower(int tagIndex, QString measurementType)
 		int stepSize=7;
 		for (int i=1; i<=6; i++)  // Maximum of 6 iterations to look for power
 		{
-			bool abort = moistureObserver->wizard->moistDemoPage->abortRequested();
-			if (abort)
+			if (this->abort)
 				return false;
 			setPower(nextPowerCode);
 			qDebug("Power set to %d", txPower);
@@ -898,8 +902,7 @@ bool KitModel::findOptimumPower(int tagIndex, QString measurementType)
 int KitModel::searchForTempTags()
 {
 	qDebug("searchForTempTags()");
-	bool abort=false;
-	while (abort==false)
+	while (this->abort==false)
 	{
 		setPower(tempMaxPower);
 		findTags(2, "Temperature");
@@ -912,15 +915,35 @@ int KitModel::searchForTempTags()
 			qDebug("Tags found");
 			break;
 		}
-		abort = tempObserver->wizard->tempDemoPage->abortRequested();
+	}
+	return 0;
+}
+int KitModel::searchForTempTags(int maxSearchTime)
+{
+	qDebug("searchForTempTags()");
+	QTime timer;
+	clearTags("Temperature");
+	timer.start();
+	while (this->abort==false && timer.elapsed() < maxSearchTime)
+	{
+		setPower(tempMaxPower);
+		findTags(2, "Temperature");
+		setPower((19 + tempMaxPower)/2);
+		findTags(2, "Temperature");
+		qDebug("No tags found");
+		if (TempTagList.length() > 0)
+		{
+			setSelectsForReading();
+			qDebug("Tags found");
+			break;
+		}
 	}
 	return 0;
 }
 int KitModel::searchForMoistTags()
 {
 	qDebug("searchForMoistTags()");
-	bool abort=false;
-	while (abort==false)
+	while (this->abort==false)
 	{
 		setPower(moistMaxPower);
 		findTags(2, "Moisture");
@@ -933,9 +956,46 @@ int KitModel::searchForMoistTags()
 			qDebug("Tags found");
 			break;
 		}
-		abort = moistureObserver->wizard->moistDemoPage->abortRequested();
 	}
 	return 0;
+}
+int KitModel::searchForMoistTags(int maxSearchTime)
+{
+	qDebug("searchForMoistTags()");
+	QTime timer;
+	clearTags("Moisture");
+	timer.start();
+	while (this->abort==false && timer.elapsed() < maxSearchTime)
+	{
+		setPower(moistMaxPower);
+		findTags(2, "Moisture");
+		setPower((19 + moistMaxPower)/2);
+		findTags(2, "Moisture");
+		qDebug("No tags found");
+		if (MoistTagList.length() > 0)
+		{
+			setSelectsForReading();
+			qDebug("Tags found");
+			break;
+		}
+	}
+	return 0;
+}
+int KitModel::getTempMaxPowerLevel()
+{
+	int powerCode = tempMaxPower;
+	if (powerCode >= 6 && powerCode <= 7)
+		return (36 - powerCode);
+	else if (powerCode >= 9 && powerCode <= 19)
+		return (37 - powerCode);
+}
+int KitModel::getMoistMaxPowerLevel()
+{
+	int powerCode = moistMaxPower;
+	if (powerCode >= 6 && powerCode <= 7)
+		return (36 - powerCode);
+	else if (powerCode >= 9 && powerCode <= 19)
+		return (37 - powerCode);
 }
 int KitModel::writeDataToTag(QString epc, char bankCode, int address, QString dataHexString)
 {
@@ -977,7 +1037,6 @@ int KitModel::writeDataToTag(QString epc, char bankCode, int address, QString da
 }
 int KitModel::measureTempTags()
 {
-	bool abort;
 	int validTempCount;
 	int validOcRssiCount;
 	for (int t=0; t<TempTagList.length(); t++)
@@ -992,8 +1051,7 @@ int KitModel::measureTempTags()
 		setSelectsForReading();		
 		if (TempTagList[t].getCrcValid()==true && TempTagList[t].SelectedForMeasurement)
 		{
-			abort = tempObserver->wizard->tempDemoPage->abortRequested();
-			if (abort)
+			if (this->abort)
 				return 0;
 			float temp;	
 			bool goodPower=true;
@@ -1003,8 +1061,7 @@ int KitModel::measureTempTags()
 			}
 			for (int r=0; r<=4*tempMinSamplesPerMeas; r++)
 			{
-				abort = tempObserver->wizard->tempDemoPage->abortRequested();
-				if (abort)
+				if (this->abort)
 					return 0;
 				if (tempAutoPower == true)
 				{
@@ -1078,7 +1135,6 @@ int KitModel::measureTempTags()
 }
 int KitModel::measureMoistTags()
 {
-	bool abort;
 	int validMoistCount;
 	int validOcRssiCount;
 	for (int t=0; t<MoistTagList.length(); t++)
@@ -1093,8 +1149,7 @@ int KitModel::measureMoistTags()
 		setSelectsForReading();		
 		if (MoistTagList[t].SelectedForMeasurement)
 		{
-			abort = moistureObserver->wizard->moistDemoPage->abortRequested();
-			if (abort)
+			if (this->abort)
 				return 0;
 			float moist;	
 			bool goodPower=true;
@@ -1104,8 +1159,7 @@ int KitModel::measureMoistTags()
 			}
 			for (int r=0; r<=4*moistMinSamplesPerMeas; r++)
 			{
-				abort = moistureObserver->wizard->moistDemoPage->abortRequested();
-				if (abort)
+				if (this->abort)
 					return 0;
 				if (moistAutoPower == true)
 				{						
@@ -1191,7 +1245,6 @@ int KitModel::measureMoistTags()
 }
 double KitModel::measureTempCodeForCalibration()
 {
-	bool abort;
 	float tempCode;
 	int validTempCount;
 	int desiredSampleCount=20;
@@ -1215,8 +1268,7 @@ double KitModel::measureTempCodeForCalibration()
 			for (int r=0; r<=6*desiredSampleCount; r++)
 			{
 				qDebug("Attempt %d", r);
-				abort = tempObserver->wizard->tempDemoPage->calibrationDialog->calibrationPage->onePointTab->abortRequested();
-				if (abort)
+				if (this->abort)
 				{
 					qDebug("Abort requested");
 					return -1000;
