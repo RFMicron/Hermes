@@ -1,0 +1,19 @@
+build/default/production/_ext/1360937237/iso6b.o:  \
+../src/iso6b.c  \
+../src/global.h  \
+../src/as3993_config.h  \
+../../../common/firmware/microchip/include/ams_types.h  \
+../../../common/firmware/microchip/include/GenericTypeDefs.h  \
+../src/timer.h  \
+../src/bitbang.h  \
+../src/platform.h  \
+../../../common/firmware/microchip/include/Compiler.h  \
+../../../common/firmware/microchip/include/sprintf.h  \
+../../../common/firmware/microchip/include/ams_types.h  \
+../src/as3993.h  \
+../src/iso6b.h  \
+../src/as3993_public.h  \
+../src/errno_as3993.h  \
+../../../common/firmware/microchip/include/errno.h  \
+../src/crc16.h  \
+../../../common/firmware/microchip/include/logger.h 

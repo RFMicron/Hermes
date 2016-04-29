@@ -1,0 +1,62 @@
+/** \page buildconf Build Environment
+
+This file explains how to configure the build environment and tools for building AS3993 Firmware (FW).
+
+\section buildreq Requirements
+Before building the AS3993 FW you need to setup the required build tools. Requirements are:
+ - An installation of c30 pic compiler
+ - An User environment variable c30dir which contains the installation dir of c30 (eg: C:\\MPLABC30)
+ - Optionally: A MPLAB X installation
+
+\section buildsource Source code delivery content
+The AS3993 FW delivery contains the FW source code including a Makefile and MPLAB X project files.
+The MPLAB X project files are provided for your convenience to get a working debugging environment very fast. \n
+However, the officially release FW builds are always generated with the Makefile as it is more flexible in
+handling the various build configurations. Therefore the reliable way to get a correctly configured fw build
+is to use the Makefile. \n
+The output of the Makefile build is build/as3993.bin.
+
+\section buildvars Build Configuration variables
+The build configurations are:
+    - UART Logger enabled/disabled (USE_LOGGER in Makefile)
+    - UART host communication instead of USB (USE_UART_STREAM_DRIVER in Makefile)
+    - target CPU device, defaults to 24FJ64GB002 but can be changed in build environment (CPU in Makefile)
+    - bootloader support, defaults to enabled but can be disabled in build environment (ENABLE_BOOTLOADER in Makefile)
+    - Fermi, Femto, Mega target board (each target board has a define in as3993_config.h)
+    - AS3993/AS3994/AS3980 support (each reader has a define in as3993_config.h)
+
+\attention
+When UART host communication is used, UART logger has to be disabled as the logging output on the UART will break
+communication between board and host.\n Therefore USE_LOGGER and USE_UART_STREAM_DRIVER are not allowed to be defined
+at the same time. The resulting binary would not be able to communicate without errors with the host, because every
+log message which is printed on uart will break protocol data flow.
+
+\section buildexample Build examples
+Building of the FW for various configurations is handled in the createDelivery.sh script, which can be executed
+eg. in a cygwin environment. Have a look at it to get a feeling how each configuration is handled differently.
+3 examples will be discussed in detail:
+\subsection buildfemto FEMTO AS3993 with uart logging enabled:
+    - set FEMTO define in as3993_config.h to 1, set other board defines to 0
+    - set RUN_ON_AS3993 define in as3993_config.h to 1, set other reader defines to 0
+    - execute: make clean
+    - execute: make USE_LOGGER=1
+\note
+If you want uart logging completely disabled, execute make without any parameter.
+
+\subsection builduart FEMTO AS3993 with uart host communication enabled:
+    - set FEMTO define in as3993_config.h to 1, set other board defines to 0
+    - set RUN_ON_AS3993 define in as3993_config.h to 1, set other reader defines to 0
+    - execute: make clean
+    - execute: make USE_UART_STREAM_DRIVER=1
+\note
+Do not use USE_UART_STREAM_DRIVER in combination with USE_LOGGER except if you want to
+debug problems and know what you are doing. Host communication will fail when a log messages
+is printed on UART.
+
+\subsection buildmega MEGA AS3994 with uart host communication and without bootloader support:
+    - set MEGA define in as3993_config.h to 1, set other board defines to 0
+    - set RUN_ON_AS3994 define in as3993_config.h to 1, set other reader defines to 0
+    - execute: make clean
+    - execute: make USE_UART_STREAM_DRIVER=1 CPU=24FJ256GB110 DISABLE_BOOTLOADER=1
+
+*/

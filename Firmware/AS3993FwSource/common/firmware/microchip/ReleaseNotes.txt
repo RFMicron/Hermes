@@ -1,0 +1,10 @@
+rvei (Tue, May 07, 2013 09:50:34 AM):
+
+- i2c_driver: corrected frequency in i2cInitialise (now calculated concerning the sysclk), custom speed can be set
+
+rvei rvei (Fri, May 17, 2013 01:36:34 PM):
+
+- new include: ams_math_macros.h, used by i2c_driver.c
+
+
+

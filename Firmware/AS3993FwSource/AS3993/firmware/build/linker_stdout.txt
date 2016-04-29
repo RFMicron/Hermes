@@ -1,0 +1,47 @@
+Microchip MPLAB C30 License Manager Version  (Build Date Oct 28 2011).
+Copyright (c) 2008 Microchip Technology Inc. All rights reserved.
+The MPLAB C30 license has less than 14 days remaining.
+
+
+Program Memory  [Origin = 0x200, Length = 0x8e00]
+
+section                    address   length (PC units)   length (bytes) (dec)
+-------                    -------   -----------------   --------------------
+.text                        0x200               0x4f0           0x768  (1896)
+.const                       0x6f0               0x2ce           0x435  (1077)
+.text                        0x9be              0x3cd6          0x5b41  (23361)
+.dinit                      0x4694                0xf4           0x16e  (366)
+.text                       0x4788               0x1ae           0x285  (645)
+.init.delay32               0x4936                0x1c            0x2a  (42)
+_02b360e05630075e           0x8ffc                 0x2             0x3  (3)
+_02b360005630075e           0x8ffe                 0x2             0x3  (3)
+
+                     Total program memory used (bytes):         0x6b01  (27393) 50%
+
+
+Data Memory  [Origin = 0x800, Length = 0x2000]
+
+section                    address      alignment gaps    total length  (dec)
+-------                    -------      --------------    -------------------
+.nbss                        0x800                   0          0x1360  (4960)
+.ndata                      0x1b60                   0            0xc0  (192)
+.nbss                       0x1c20                   0           0x1b6  (438)
+.ndata                      0x1dd6                   0            0x16  (22)
+.nbss                       0x1dec                   0             0x6  (6)
+.ndata                      0x1df2                   0             0x6  (6)
+.nbss                       0x1df8                   0             0x4  (4)
+.ndata                      0x1dfc                   0             0x4  (4)
+.nbss                       0x1e00                   0             0x2  (2)
+
+                        Total data memory used (bytes):         0x1602  (5634) 68%
+
+
+Dynamic Memory Usage
+
+region                     address                      maximum length  (dec)
+------                     -------                      ---------------------
+heap                             0                                   0  (0)
+stack                       0x1e02                               0x9fe  (2558)
+
+                        Maximum dynamic memory (bytes):          0x9fe  (2558)
+

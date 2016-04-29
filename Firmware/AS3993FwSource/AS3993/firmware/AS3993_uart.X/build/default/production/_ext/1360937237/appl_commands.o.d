@@ -1,0 +1,20 @@
+build/default/production/_ext/1360937237/appl_commands.o:  \
+ ../src/appl_commands.c  \
+../src/as3993_config.h  \
+../src/platform.h  \
+../../../common/firmware/microchip/include/Compiler.h  \
+../../../common/firmware/microchip/include/sprintf.h  \
+../../../common/firmware/microchip/include/ams_types.h  \
+../../../common/firmware/microchip/include/GenericTypeDefs.h  \
+../src/global.h  \
+../../../common/firmware/microchip/include/ams_types.h  \
+../src/gen2.h  \
+../src/as3993_public.h  \
+../src/errno_as3993.h  \
+../../../common/firmware/microchip/include/errno.h  \
+../src/appl_commands.h  \
+../../../common/firmware/microchip/include/logger.h  \
+../src/iso6b.h  \
+../src/timer.h  \
+../src/as3993.h  \
+../src/tuner.h 

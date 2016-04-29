@@ -1,0 +1,7 @@
+// suppress unused Variables
+unreadVariable:src/appl_commands.c
+
+
+// suppress unused Functions
+unusedFunction:src\bitbang.c
+unusedFunction:src\timer.c

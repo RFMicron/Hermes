@@ -1,0 +1,36 @@
+build/default/production/_ext/1611813562/stream_dispatcher.o:  \
+ ../../../common/firmware/microchip/src/stream_dispatcher.c  \
+../../../common/firmware/microchip/include/system_clock.h  \
+../../../common/firmware/microchip/include/ams_types.h  \
+../../../common/firmware/microchip/include/GenericTypeDefs.h  \
+../../../common/include/ams_stream.h  \
+../../../common/firmware/microchip/include/stream_dispatcher.h  \
+../../../common/firmware/microchip/include/stream_driver.h  \
+../../../common/firmware/microchip/include/Compiler.h  \
+../../../common/firmware/microchip/include/sprintf.h  \
+../../../common/include/ams_stream.h  \
+../../../common/firmware/microchip/include/stream_driver.h  \
+../../../common/firmware/microchip/include/usb_hid_stream_driver.h  \
+../../../common/firmware/microchip/include/usb.h  \
+../src/usb_config.h  \
+../../../common/firmware/microchip/include/usb_common.h  \
+../../../common/firmware/microchip/include/usb_ch9.h  \
+../../../common/firmware/microchip/include/usb_device.h  \
+../../../common/firmware/microchip/include/usb_hal.h  \
+../../../common/firmware/microchip/include/usb_hal_pic24.h  \
+../../../common/firmware/microchip/include/usb_function_hid.h  \
+../../../common/firmware/microchip/include/uart_stream_driver.h  \
+../../../common/firmware/microchip/include/uart_driver.h  \
+../../../common/firmware/microchip/include/bootloadable.h  \
+../../../common/firmware/microchip/include/ams_types.h  \
+../../../common/firmware/microchip/include/i2c_driver.h  \
+../../../common/firmware/microchip/include/spi_driver.h  \
+../../../common/firmware/microchip/include/logger.h  \
+../src/appl_commands.h  \
+../src/global.h  \
+../src/as3993_config.h  \
+../../../common/firmware/microchip/include/ams_types.h  \
+../src/platform.h  \
+../../../common/firmware/microchip/include/Compiler.h  \
+../src/timer.h  \
+../src/crc16.h 

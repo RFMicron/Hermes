@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1"/>
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/C:/Users/Frank/Documents/ams/AS3993FwSource_4-7-15/AS3993/firmware/src/as3993.c</file>
+            <file>file:/C:/Users/Frank/Documents/ams/AS3993FwSource_4-7-15/common/include/ams_stream.h</file>
+            <file>file:/C:/Users/Frank/Documents/ams/AS3993FwSource_4-7-15/common/firmware/microchip/src/uart_driver.c</file>
+            <file>file:/C:/Users/Frank/Documents/ams/AS3993FwSource_4-7-15/AS3993/firmware/src/appl_commands_table.c</file>
+            <file>file:/C:/Users/Frank/Documents/ams/AS3993FwSource_4-7-15/AS3993/firmware/src/as3993_config.h</file>
+            <file>file:/C:/Users/Frank/Documents/ams/AS3993FwSource_4-7-15/AS3993/firmware/src/gen2.c</file>
+            <file>file:/C:/Users/Frank/Documents/ams/AS3993FwSource_4-7-15/AS3993/firmware/src/gen2.h</file>
+            <file>file:/C:/Users/Frank/Documents/ams/AS3993FwSource_4-7-15/AS3993/firmware/src/tuner.c</file>
+            <file>file:/C:/Users/Frank/Documents/ams/AS3993FwSource_4-7-15/AS3993/firmware/src/appl_commands.c</file>
+            <file>file:/C:/Users/Frank/Documents/ams/AS3993FwSource_4-7-15/common/firmware/microchip/src/stream_dispatcher.c</file>
+            <file>file:/C:/Users/Frank/Documents/ams/AS3993FwSource_4-7-15/AS3993/firmware/src/as3993_public.h</file>
+            <file>file:/C:/Users/Frank/Documents/ams/AS3993FwSource_4-7-15/AS3993/firmware/src/main.c</file>
+            <file>file:/C:/Users/Frank/Documents/ams/AS3993FwSource_4-7-15/common/firmware/microchip/src/bootloadable.c</file>
+            <file>file:/C:/Users/Frank/Documents/ams/AS3993FwSource_4-7-15/AS3993/firmware/src/appl_commands.h</file>
+            <file>file:/C:/Users/Frank/Documents/ams/AS3993FwSource_4-7-15/AS3993/firmware/src/tuner.h</file>
+        </group>
+    </open-files>
+</project-private>
