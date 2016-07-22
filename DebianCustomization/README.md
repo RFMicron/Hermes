@@ -2,6 +2,7 @@
 
 ### Customization Packages
 * Packages for release version 1.0: [rfmicron-hermes-debian-customization-packages-1.0.tar.gz](http://rfmicron.com/download/2162/)
+* Packages for release version 1.1:
 [rfmicron-hermes-debian-customization-packages-1.1.tar.gz](http://rfmicron.com/download/2934/)
 
 ### Qt Source Code for Linux
